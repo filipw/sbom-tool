@@ -55,9 +55,9 @@ public abstract class PathBasedFileToJsonProviderBase : EntityToJsonProviderBase
         // Generate hash code for the files
         var (fileInfos, hashingErrors) = fileHasher.Run(filteredFiles);
         errors.Add(hashingErrors);
-        var deduplicatedFileInfos = internalSBOMFileInfoDeduplicator.Deduplicate(fileInfos);
+        fileInfos = internalSBOMFileInfoDeduplicator.Deduplicate(fileInfos);
 
-        var (jsonDocCount, jsonErrors) = fileHashWriter.Write(deduplicatedFileInfos, requiredConfigs);
+        var (jsonDocCount, jsonErrors) = fileHashWriter.Write(fileInfos, requiredConfigs);
         errors.Add(jsonErrors);
 
         return (jsonDocCount, ChannelUtils.Merge(errors.ToArray()));

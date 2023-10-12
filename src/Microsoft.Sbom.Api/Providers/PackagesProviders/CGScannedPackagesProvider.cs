@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -24,8 +24,6 @@ public class CGScannedPackagesProvider : CommonPackagesProvider<ScannedComponent
 
     private readonly PackagesWalker packagesWalker;
 
-    private ILicenseInformationFetcher licenseInformationFetcher;
-
     public CGScannedPackagesProvider(
         IConfiguration configuration,
         ChannelUtils channelUtils,
@@ -33,13 +31,11 @@ public class CGScannedPackagesProvider : CommonPackagesProvider<ScannedComponent
         ISbomConfigProvider sbomConfigs,
         PackageInfoJsonWriter packageInfoJsonWriter,
         ComponentToPackageInfoConverter packageInfoConverter,
-        PackagesWalker packagesWalker,
-        ILicenseInformationFetcher licenseInformationFetcher)
-        : base(configuration, channelUtils, logger, sbomConfigs, packageInfoJsonWriter, licenseInformationFetcher)
+        PackagesWalker packagesWalker)
+        : base(configuration, channelUtils, logger, sbomConfigs, packageInfoJsonWriter)
     {
         this.packageInfoConverter = packageInfoConverter ?? throw new ArgumentNullException(nameof(packageInfoConverter));
         this.packagesWalker = packagesWalker ?? throw new ArgumentNullException(nameof(packagesWalker));
-        this.licenseInformationFetcher = licenseInformationFetcher ?? throw new ArgumentNullException(nameof(licenseInformationFetcher));
     }
 
     public override bool IsSupported(ProviderType providerType)
@@ -77,7 +73,7 @@ public class CGScannedPackagesProvider : CommonPackagesProvider<ScannedComponent
     {
         var (output, cdErrors) = packagesWalker.GetComponents(Configuration.BuildComponentPath?.Value);
 
-        if (cdErrors.TryRead(out var e))
+        if (cdErrors.TryRead(out ComponentDetectorException e))
         {
             throw e;
         }

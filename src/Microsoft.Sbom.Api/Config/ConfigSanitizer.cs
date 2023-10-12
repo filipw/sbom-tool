@@ -175,7 +175,7 @@ public class ConfigSanitizer
         // If assembly name is not defined and namespace was not provided then return the default namespace as per spdx spec https://spdx.github.io/spdx-spec/v2.2.2/document-creation-information/#653-examples.
         if (string.IsNullOrWhiteSpace(assemblyConfig.DefaultSBOMNamespaceBaseUri) && string.IsNullOrEmpty(configuration.NamespaceUriBase?.Value))
         {
-            var defaultNamespaceUriBase = $"https://spdx.org/spdxdocs/sbom-tool-{SBOMToolVersion}-{Guid.NewGuid()}";
+            string defaultNamespaceUriBase = $"https://spdx.org/spdxdocs/sbom-tool-{SBOMToolVersion}-{Guid.NewGuid()}";
 
             logger.Information($"No namespace URI base provided, using unique generated default value {defaultNamespaceUriBase}");
 
@@ -186,7 +186,7 @@ public class ConfigSanitizer
             };
         }
 
-        // If the user provides the parameter even when the assembly attribute is provided,
+        // If the user provides the parameter even when the assembly attribute is provided, 
         // show a warning on the console.
         if (!string.IsNullOrWhiteSpace(configuration.NamespaceUriBase?.Value))
         {
@@ -223,8 +223,8 @@ public class ConfigSanitizer
             return configuration.PackageSupplier;
         }
 
-        return new ConfigurationSetting<string>
-        {
+        return new ConfigurationSetting<string> 
+        { 
             Source = SettingSource.Default,
             Value = assemblyConfig.DefaultPackageSupplier
         };

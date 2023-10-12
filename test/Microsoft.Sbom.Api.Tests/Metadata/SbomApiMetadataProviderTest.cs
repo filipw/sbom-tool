@@ -40,21 +40,21 @@ public class SbomApiMetadataProviderTest
     {
         metadata.BuildEnvironmentName = "name";
 
-        var sbomApiMetadataProvider = new SBOMApiMetadataProvider(metadata, config);
+        SBOMApiMetadataProvider sbomApiMetadataProvider = new SBOMApiMetadataProvider(metadata, config);
         Assert.AreEqual("name", sbomApiMetadataProvider.BuildEnvironmentName);
     }
 
     [TestMethod]
     public void SbomApiMetadataProvider_BuildEnvironmentName_WithoutMetadata()
     {
-        var sbomApiMetadataProvider = new SBOMApiMetadataProvider(metadata, config);
+        SBOMApiMetadataProvider sbomApiMetadataProvider = new SBOMApiMetadataProvider(metadata, config);
         Assert.AreEqual(null, sbomApiMetadataProvider.BuildEnvironmentName);
     }
 
     [TestMethod]
     public void SbomApiMetadataProvider_GetDocumentNamespaceUri()
     {
-        var sbomApiMetadataProvider = new SBOMApiMetadataProvider(metadata, config);
+        SBOMApiMetadataProvider sbomApiMetadataProvider = new SBOMApiMetadataProvider(metadata, config);
         Assert.AreEqual("http://sbom.microsoft/packageName/packageVersion/some-custom-value-here", sbomApiMetadataProvider.GetDocumentNamespaceUri());
     }
 

@@ -22,7 +22,7 @@ internal ref struct SbomRelationshipParser
     private const string RelationshipTypeProperty = "relationshipType";
 
     private readonly Stream stream;
-    private readonly SPDXRelationship sbomRelationship = new();
+    private readonly SPDXRelationship sbomRelationship = new ();
 
     public SbomRelationshipParser(Stream stream)
     {
@@ -123,7 +123,7 @@ internal ref struct SbomRelationshipParser
             missingProps.Add(nameof(sbomRelationship.SourceElementId));
         }
 
-        if (missingProps.Any())
+        if (missingProps.Count() > 0)
         {
             throw new ParserException($"Missing required value(s) for relationship object at position {stream.Position}: {string.Join(",", missingProps)}");
         }

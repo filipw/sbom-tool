@@ -17,8 +17,8 @@ public class ComponentDetectionCliArgumentBuilder
     private string action;
     private VerbosityMode verbosity = VerbosityMode.Quiet;
     private string sourceDirectory;
-    private Dictionary<string, string> detectorArgs = new Dictionary<string, string>() {
-        { TimeoutArgsParamName, TimeoutDefaultSeconds.ToString() }
+    private Dictionary<string, string> detectorArgs = new Dictionary<string, string>() { 
+        { TimeoutArgsParamName, TimeoutDefaultSeconds.ToString() } 
     };
 
     private Dictionary<string, string> keyValueArgs = new Dictionary<string, string>();
@@ -74,7 +74,7 @@ public class ComponentDetectionCliArgumentBuilder
 
         if (keyArgs.Any())
         {
-            var keyArgsCommand = string.Join(" ", keyArgs.Select(this.AsArgumentValue));
+            var keyArgsCommand = string.Join(" ", keyArgs.Select(x => AsArgumentValue(x)));
             command += $" {keyArgsCommand}";
         }
 
@@ -117,7 +117,7 @@ public class ComponentDetectionCliArgumentBuilder
             throw new ArgumentNullException($"{nameof(value)} should not be null");
         }
 
-        name = name.StartsWith("--", StringComparison.Ordinal) ? name.Substring(2) : name;
+        name = name.StartsWith("--") ? name.Substring(2) : name;
 
         if (string.IsNullOrEmpty(name))
         {
@@ -167,7 +167,7 @@ public class ComponentDetectionCliArgumentBuilder
             throw new ArgumentNullException($"{nameof(value)} should not be null");
         }
 
-        if (value.StartsWith("--", StringComparison.Ordinal) && !keyArgs.Exists(item => item == value))
+        if (value.StartsWith("--") && !keyArgs.Exists(item => item == value))
         {
             keyArgs.Add(value);
         }
@@ -191,15 +191,15 @@ public class ComponentDetectionCliArgumentBuilder
         }
 
         var argArray = Args.Convert(args);
-        for (var i = 0; i < argArray.Length; i++)
+        for (int i = 0; i < argArray.Length; i++)
         {
-            if (argArray[i].StartsWith("--", StringComparison.Ordinal) && i + 1 < argArray.Length && !argArray[i + 1].StartsWith("--", StringComparison.Ordinal))
+            if (argArray[i].StartsWith("--") && i + 1 < argArray.Length && !argArray[i + 1].StartsWith("--"))
             {
                 AddArg(argArray[i].Substring(2), argArray[i + 1]);
                 i++;
                 continue;
             }
-            else if (argArray[i].StartsWith("--", StringComparison.Ordinal))
+            else if (argArray[i].StartsWith("--"))
             {
                 AddArg(argArray[i].Substring(2));
             }

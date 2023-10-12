@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>Microsoft.Sbom.Contracts</AssemblyName>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Contracts and interfaces for SBOM API</Description>

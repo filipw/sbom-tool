@@ -31,12 +31,12 @@ public class SbomConfigProvider : ISbomConfigProvider
                 // Exit fast if config map is already initialized.
                 return configsDictionary;
             }
-
+               
             // Initialize new config map.
             configsDictionary = new Dictionary<ManifestInfo, ISbomConfig>();
             foreach (var configHandler in manifestConfigHandlers)
             {
-                if (configHandler.TryGetManifestConfig(out var sbomConfig))
+                if (configHandler.TryGetManifestConfig(out ISbomConfig sbomConfig))
                 {
                     configsDictionary.AddIfKeyNotPresentAndValueNotNull(sbomConfig.ManifestInfo, sbomConfig);
                     recorder.RecordSBOMFormat(sbomConfig.ManifestInfo, sbomConfig.ManifestJsonFilePath);
@@ -140,7 +140,7 @@ public class SbomConfigProvider : ISbomConfigProvider
 
     public object GetMetadata(MetadataKey key)
     {
-        if (MetadataDictionary.TryGetValue(key, out var value))
+        if (MetadataDictionary.TryGetValue(key, out object value))
         {
             logger.Debug($"Found value for header {key} in internal metadata.");
             return value;
@@ -177,7 +177,7 @@ public class SbomConfigProvider : ISbomConfigProvider
 
     public GenerationData GetGenerationData(ManifestInfo manifestInfo)
     {
-        if (ConfigsDictionary.TryGetValue(manifestInfo, out var sbomConfig))
+        if (ConfigsDictionary.TryGetValue(manifestInfo, out ISbomConfig sbomConfig))
         {
             return sbomConfig.Recorder.GetGenerationData();
         }
@@ -188,10 +188,11 @@ public class SbomConfigProvider : ISbomConfigProvider
     public string GetSBOMNamespaceUri()
     {
         IMetadataProvider provider = null;
-        if (MetadataDictionary.TryGetValue(MetadataKey.BuildEnvironmentName, out var buildEnvironmentName))
+        if (MetadataDictionary.TryGetValue(MetadataKey.BuildEnvironmentName, out object buildEnvironmentName))
         {
-            provider = this.metadataProviders
-                .FirstOrDefault(p => p.BuildEnvironmentName != null && p.BuildEnvironmentName == buildEnvironmentName as string);
+            provider = metadataProviders
+                .Where(p => p.BuildEnvironmentName != null && p.BuildEnvironmentName == buildEnvironmentName as string)
+                .FirstOrDefault();
         }
         else
         {

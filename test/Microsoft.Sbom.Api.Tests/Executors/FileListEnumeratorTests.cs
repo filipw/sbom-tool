@@ -20,14 +20,14 @@ public class FileListEnumeratorTests
     [TestMethod]
     public async Task ListWalkerTests_ValidListFile_SucceedsAsync()
     {
-        var files = new List<string>
+        List<string> files = new List<string>
         {
             @"d:\directorya\directoryb\file1.txt",
             @"d:\directorya\directoryc\file3.txt",
         };
 
-        var fileText = string.Join(Environment.NewLine, files);
-        var testFileName = "somefile";
+        string fileText = string.Join(Environment.NewLine, files);
+        string testFileName = "somefile";
 
         var mockFSUtils = new Mock<IFileSystemUtils>();
         mockFSUtils.Setup(m => m.ReadAllText(It.Is<string>(d => d == testFileName))).Returns(fileText).Verifiable();
@@ -38,15 +38,15 @@ public class FileListEnumeratorTests
         mockFSUtils.Setup(m => m.AbsolutePath(It.Is<string>(d => d == files[1]))).Returns(files[1]);
 
         var filesChannelReader = new FileListEnumerator(mockFSUtils.Object, mockLogger.Object).GetFilesFromList(testFileName);
-        var errorCount = 0;
+        int errorCount = 0;
 
-        await foreach (var error in filesChannelReader.errors.ReadAllAsync())
+        await foreach (Entities.FileValidationResult error in filesChannelReader.errors.ReadAllAsync())
         {
             Assert.AreEqual(Entities.ErrorType.MissingFile, error.ErrorType);
             errorCount++;
         }
 
-        await foreach (var file in filesChannelReader.file.ReadAllAsync())
+        await foreach (string file in filesChannelReader.file.ReadAllAsync())
         {
             Assert.IsTrue(files.Remove(file));
         }
@@ -79,14 +79,14 @@ public class FileListEnumeratorTests
     [TestMethod]
     public async Task ListWalkerTests_UnreachableFile_FailsAsync()
     {
-        var files = new List<string>
+        List<string> files = new List<string>
         {
             @"d:\directorya\directoryb\file1.txt",
             @"d:\directorya\directoryc\file3.txt",
         };
 
-        var fileText = string.Join(Environment.NewLine, files);
-        var testFileName = "somefile";
+        string fileText = string.Join(Environment.NewLine, files);
+        string testFileName = "somefile";
 
         var mockFSUtils = new Mock<IFileSystemUtils>();
         mockFSUtils.Setup(m => m.ReadAllText(It.Is<string>(d => d == testFileName))).Returns(fileText).Verifiable();
@@ -97,15 +97,15 @@ public class FileListEnumeratorTests
         mockFSUtils.Setup(m => m.AbsolutePath(It.Is<string>(d => d == files[1]))).Returns(files[1]);
 
         var filesChannelReader = new FileListEnumerator(mockFSUtils.Object, mockLogger.Object).GetFilesFromList(testFileName);
-        var errorCount = 0;
+        int errorCount = 0;
 
-        await foreach (var error in filesChannelReader.errors.ReadAllAsync())
+        await foreach (Entities.FileValidationResult error in filesChannelReader.errors.ReadAllAsync())
         {
             Assert.AreEqual(Entities.ErrorType.MissingFile, error.ErrorType);
             errorCount++;
         }
 
-        await foreach (var file in filesChannelReader.file.ReadAllAsync())
+        await foreach (string file in filesChannelReader.file.ReadAllAsync())
         {
             Assert.IsTrue(files.Remove(file));
         }

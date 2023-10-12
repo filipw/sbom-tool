@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics.Tracing;
@@ -17,7 +17,7 @@ public class RuntimeConfiguration
     public int WorkflowParallelism { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether if set, we will delete any _manifest directory in the root path before creating a
+    /// Gets or sets a value indicating whether if set, we will delete any _manifest directory in the root path before creating a 
     /// new SBOM. If there is already a _manifest directory in the root path and this switch
     /// is false, we will fail SBOM generation.
     /// </summary>

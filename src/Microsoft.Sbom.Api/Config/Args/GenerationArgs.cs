@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using PowerArgs;
@@ -26,12 +26,12 @@ public class GenerationArgs : CommonArgs
 
     /// <summary>
     /// Gets or sets the file path containing a list of files for which the manifest file will be generated.
-    /// List file is an unordered set of files formated as one file per line separated
+    /// List file is an unordered set of files formated as one file per line separated 
     /// by Environment.NewLine. Blank lines are discarded.
     /// </summary>
     [ArgShortcut("bl")]
-    [ArgDescription("The file path to a file containing a list of files one file per line for which the SBOM" +
-                    " file will be generated. Only files listed in the file will be included in the generated SBOM.")]
+    [ArgDescription("The file path to a file containing a list of files one file per line for which the SBOM" + 
+                    " file will be generated. Only files listed in the file will be inlcuded in the generated SBOM.")]
     public string BuildListFile { get; set; }
 
     /// <summary>
@@ -67,7 +67,7 @@ public class GenerationArgs : CommonArgs
     public string DockerImagesToScan { get; set; }
 
     [ArgShortcut("cd")]
-    [ArgDescription("Additional set of arguments for Component Detector.  An appropriate usage of this would be a space-delimited list of `--key value` pairs, representing command-line switches.")]
+    [ArgDescription("Additional set of arguments for Component Detector.  An appropriate usage of this would be a space-delimited list of `--key value` pairs, respresenting command-line switches.")]
     public string AdditionalComponentDetectorArgs { get; set; }
 
     /// <summary>
@@ -108,11 +108,4 @@ public class GenerationArgs : CommonArgs
                     "asking the user for confirmation. The new manifest directory will then be created at this location and the generated SBOM " +
                     "will be stored there.")]
     public bool? DeleteManifestDirIfPresent { get; set; }
-
-    /// <summary>
-    /// If set to true, we will attempt to fetch license information of packages detected in the SBOM from the ClearlyDefinedApi.
-    /// </summary>
-    [ArgShortcut("li")]
-    [ArgDescription("If set to true, we will attempt to fetch license information of packages detected in the SBOM from the ClearlyDefinedApi.")]
-    public bool? FetchLicenseInformation { get; set; }
 }

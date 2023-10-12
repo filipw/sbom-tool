@@ -10,7 +10,7 @@ namespace Microsoft.Sbom.Api.Output.Telemetry;
 /// <summary>
 /// Records the elapsed time for a given event.
 /// </summary>
-public sealed class TimingRecorder : IDisposable
+public class TimingRecorder : IDisposable
 {
     private readonly string eventName;
     private readonly Stopwatch stopWatch;

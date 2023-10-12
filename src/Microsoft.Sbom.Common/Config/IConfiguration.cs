@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -30,7 +30,7 @@ public interface IConfiguration
     ConfigurationSetting<string> BuildComponentPath { get; set; }
 
     /// <summary>
-    /// Gets or sets full file name of a list file that contains all files to be
+    /// Gets or sets full file name of a list file that contains all files to be 
     /// validated.
     /// </summary>
     ConfigurationSetting<string> BuildListFile { get; set; }
@@ -121,7 +121,7 @@ public interface IConfiguration
 
     /// <summary>
     /// Gets or sets a list of <see cref="SbomFile"/> files provided to us from the API.
-    /// We won't traverse the build root path to get a list of files if this is set, and
+    /// We won't traverse the build root path to get a list of files if this is set, and 
     /// use the list provided here instead.
     /// </summary>
     ConfigurationSetting<IEnumerable<SbomFile>> FilesList { get; set; }
@@ -145,7 +145,7 @@ public interface IConfiguration
     ConfigurationSetting<string> DockerImagesToScan { get; set; }
 
     /// <summary>
-    /// Gets or sets full file path to a file that contains list of external SBOMs to be
+    /// Gets or sets full file path to a file that contains list of external SBOMs to be 
     /// included as External document reference.
     /// </summary>
     ConfigurationSetting<string> ExternalDocumentReferenceListFile { get; set; }
@@ -171,6 +171,8 @@ public interface IConfiguration
     /// <summary>
     /// Gets or sets a timestamp in the format <code>yyyy-MM-ddTHH:mm:ssZ</code> that will be used as the generated timestamp for the SBOM.
     /// </summary>
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1629:Documentation text should end with a period",
+        Justification = "Code element in comment.")]
     ConfigurationSetting<string> GenerationTimestamp { get; set; }
 
     /// <summary>
@@ -188,9 +190,4 @@ public interface IConfiguration
     /// If set to true, validation will fail if the SBOM does not contain any packages.
     /// </summary>
     ConfigurationSetting<bool> FailIfNoPackages { get; set; }
-
-    /// <summary>
-    /// If set to true, we will attempt to fetch license information of packages detected in the SBOM from the ClearlyDefinedApi.
-    /// </summary>
-    ConfigurationSetting<bool> FetchLicenseInformation { get; set; }
 }

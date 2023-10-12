@@ -38,7 +38,7 @@ internal class TestManifestGenerator : IManifestGenerator
             throw new ArgumentNullException(nameof(fileInfo));
         }
 
-        if (fileInfo.Checksum == null || !fileInfo.Checksum.Any())
+        if (fileInfo.Checksum == null || fileInfo.Checksum.Count() == 0)
         {
             throw new ArgumentException(nameof(fileInfo.Checksum));
         }

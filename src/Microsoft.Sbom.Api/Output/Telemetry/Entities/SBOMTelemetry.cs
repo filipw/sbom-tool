@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -32,7 +32,7 @@ public class SBOMTelemetry
     public IConfiguration Parameters { get; set; }
 
     /// <summary>
-    /// Gets or sets a list of the SBOM formats and related file properties that was used in the
+    /// Gets or sets a list of the SBOM formats and related file properties that was used in the 
     /// generation/validation of the SBOM.
     /// </summary>
     public IList<SBOMFile> SBOMFormatsUsed { get; set; }
@@ -54,15 +54,4 @@ public class SBOMTelemetry
     /// of the exception.
     /// </summary>
     public IDictionary<string, string> Exceptions { get; set; }
-
-    /// <summary>
-    /// Gets or sets if any exceptions related to API calls were thrown, this shows the name of the exception and the error message
-    /// of the exception.
-    /// </summary>
-    public IDictionary<string, string> APIExceptions { get; set; }
-
-    /// <summary>
-    /// Gets or sets the total number of licenses detected in the SBOM.
-    /// </summary>
-    public int TotalLicensesDetected { get; set; }
 }

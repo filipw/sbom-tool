@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>Microsoft.Sbom.Tool</AssemblyName>
     <RuntimeIdentifiers>win-x64;osx-x64;linux-x64</RuntimeIdentifiers>
     <IsPublishable>true</IsPublishable>
@@ -22,7 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+    <PackageReference Include="Serilog.AspNetCore" />
   </ItemGroup>
 </Project>

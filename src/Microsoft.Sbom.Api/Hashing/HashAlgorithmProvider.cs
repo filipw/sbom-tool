@@ -39,7 +39,7 @@ public class HashAlgorithmProvider : IHashAlgorithmProvider
             throw new ArgumentException($"'{nameof(algorithmName)}' cannot be null or whitespace.", nameof(algorithmName));
         }
 
-        if (algorithmNameMap.TryGetValue(algorithmName.ToLowerInvariant(), out var value))
+        if (algorithmNameMap.TryGetValue(algorithmName.ToLowerInvariant(), out AlgorithmName value))
         {
             return value;
         }

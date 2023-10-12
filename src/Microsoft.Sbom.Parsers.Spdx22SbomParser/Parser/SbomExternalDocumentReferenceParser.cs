@@ -22,7 +22,7 @@ internal ref struct SbomExternalDocumentReferenceParser
     private const string ChecksumProperty = "checksum";
 
     private readonly Stream stream;
-    private readonly SpdxExternalDocumentReference spdxExternalDocumentReference = new();
+    private readonly SpdxExternalDocumentReference spdxExternalDocumentReference = new ();
 
     public SbomExternalDocumentReferenceParser(Stream stream)
     {
@@ -114,13 +114,13 @@ internal ref struct SbomExternalDocumentReferenceParser
             missingProps.Add(nameof(spdxExternalDocumentReference.ExternalDocumentId));
         }
 
-        if (spdxExternalDocumentReference.Checksum == null
+        if (spdxExternalDocumentReference.Checksum == null 
             || spdxExternalDocumentReference.Checksum.Algorithm != AlgorithmName.SHA1.Name)
         {
             missingProps.Add(nameof(spdxExternalDocumentReference.Checksum));
         }
 
-        if (missingProps.Any())
+        if (missingProps.Count() > 0)
         {
             throw new ParserException($"Missing required value(s) for external document reference object at position {stream.Position}: {string.Join(",", missingProps)}");
         }

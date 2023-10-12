@@ -1,10 +1,9 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Microsoft.Sbom.Common.Config.Attributes;
 using Microsoft.Sbom.Contracts;
@@ -14,42 +13,40 @@ using Serilog.Events;
 
 namespace Microsoft.Sbom.Common.Config;
 
-[SuppressMessage("StyleCop.CSharp.NamingRules", "SA1311:Static readonly fields should begin with upper-case letter", Justification = "Private fields with the same name as public properties.")]
-[SuppressMessage("Naming", "CA1724:Type names should not match namespaces", Justification = "This is the configuration class")]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1311:Static readonly fields should begin with upper-case letter", Justification = "Private fields with the same name as public properties.")]
 public class Configuration : IConfiguration
 {
-    private static readonly AsyncLocal<ConfigurationSetting<string>> buildDropPath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> buildComponentPath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> buildListFile = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> manifestDirPath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> manifestPath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> outputPath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<int>> parallelism = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> configFilePath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<IList<ManifestInfo>>> manifestInfo = new();
-    private static readonly AsyncLocal<ConfigurationSetting<AlgorithmName>> hashAlgorithm = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> rootFilterPath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> catalogFilePath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<bool>> validateSignature = new();
-    private static readonly AsyncLocal<ConfigurationSetting<bool>> ignoreMissing = new();
-    private static readonly AsyncLocal<ManifestToolActions> manifestToolAction = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> packageName = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> packageVersion = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> packageSupplier = new();
-    private static readonly AsyncLocal<ConfigurationSetting<IEnumerable<SbomFile>>> filesList = new();
-    private static readonly AsyncLocal<ConfigurationSetting<IEnumerable<SbomPackage>>> packagesList = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> telemetryFilePath = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> dockerImagesToScan = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> externalDocumentReferenceListFile = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> additionalComponentDetectorArgs = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> namespaceUriUniquePart = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> namespaceUriBase = new();
-    private static readonly AsyncLocal<ConfigurationSetting<string>> generationTimestamp = new();
-    private static readonly AsyncLocal<ConfigurationSetting<bool>> followSymlinks = new();
-    private static readonly AsyncLocal<ConfigurationSetting<bool>> fetchLicenseInformation = new();
-    private static readonly AsyncLocal<ConfigurationSetting<bool>> deleteManifestDirIfPresent = new();
-    private static readonly AsyncLocal<ConfigurationSetting<bool>> failIfNoPackages = new();
-    private static readonly AsyncLocal<ConfigurationSetting<LogEventLevel>> verbosity = new();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> buildDropPath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> buildComponentPath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> buildListFile = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> manifestDirPath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> manifestPath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> outputPath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<int>> parallelism = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> configFilePath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<IList<ManifestInfo>>> manifestInfo = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<AlgorithmName>> hashAlgorithm = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> rootFilterPath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> catalogFilePath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<bool>> validateSignature = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<bool>> ignoreMissing = new ();
+    private static readonly AsyncLocal<ManifestToolActions> manifestToolAction = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> packageName = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> packageVersion = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> packageSupplier = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<IEnumerable<SbomFile>>> filesList = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<IEnumerable<SbomPackage>>> packagesList = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> telemetryFilePath = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> dockerImagesToScan = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> externalDocumentReferenceListFile = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> additionalComponentDetectorArgs = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> namespaceUriUniquePart = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> namespaceUriBase = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<string>> generationTimestamp = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<bool>> followSymlinks = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<bool>> deleteManifestDirIfPresent = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<bool>> failIfNoPackages = new ();
+    private static readonly AsyncLocal<ConfigurationSetting<LogEventLevel>> verbosity = new ();
 
     /// <inheritdoc cref="IConfiguration.BuildDropPath" />
     [DirectoryExists]
@@ -186,7 +183,7 @@ public class Configuration : IConfiguration
     }
 
     /// <inheritdoc cref="IConfiguration.PackageName" />
-    public ConfigurationSetting<string> PackageName
+    public ConfigurationSetting<string> PackageName 
     {
         get => packageName.Value;
         set => packageName.Value = value;
@@ -296,13 +293,5 @@ public class Configuration : IConfiguration
     {
         get => failIfNoPackages.Value;
         set => failIfNoPackages.Value = value;
-    }
-
-    /// <inheritdoc cref="IConfiguration.FetchLicenseInformation" />
-    [DefaultValue(false)]
-    public ConfigurationSetting<bool> FetchLicenseInformation
-    {
-        get => fetchLicenseInformation.Value;
-        set => fetchLicenseInformation.Value = value;
     }
 }

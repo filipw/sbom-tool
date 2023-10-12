@@ -39,7 +39,7 @@ public class ManifestGeneratorProvider
     public IManifestGenerator Get(ManifestInfo manifestInfo)
     {
         var key = $"{manifestInfo.Name}:{manifestInfo.Version}";
-        if (manifestMap.TryGetValue(key, out var generator))
+        if (manifestMap.TryGetValue(key, out IManifestGenerator generator))
         {
             return generator;
         }

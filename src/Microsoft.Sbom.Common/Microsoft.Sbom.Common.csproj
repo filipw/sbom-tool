@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>        
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Utility classes for SBOM generation.</Description>
     <RootNamespace>Microsoft.Sbom.Common</RootNamespace>
@@ -9,10 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mono.Posix.NETStandard" />
     <PackageReference Include="Serilog.Sinks.Console" />
-    <PackageReference Include="System.IO.FileSystem.AccessControl" />
     <PackageReference Include="System.Private.Uri" />
+    <PackageReference Include="System.IO.FileSystem.AccessControl" />
+    <PackageReference Include="Mono.Posix.NETStandard" />
   </ItemGroup>
 
   <ItemGroup>

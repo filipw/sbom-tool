@@ -1,4 +1,4 @@
-name: Generate docs
+name: 'Generate docs'
 
 on:
   workflow_dispatch:
@@ -9,17 +9,22 @@ on:
       - 'src/Microsoft.Sbom.Api/Config/Args/*.cs'
       - 'src/Microsoft.Sbom.Common/Config/IConfiguration.cs'
 
-permissions:
-  contents: write
-
 jobs:
   gen-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
+        uses: actions/setup-dotnet@v2
+
+      - name: Restore dependencies
+        run: dotnet restore 
+        
+      - name: Build
+        run: dotnet build --no-restore
 
       - name: Generate docs
         run: |
@@ -38,7 +43,7 @@ jobs:
           EOF
 
       - name: Commit
-        uses: stefanzweifel/git-auto-commit-action@8756aa072ef5b4a080af5dc8fef36c5d586e521d # v5.0.0
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'Auto update docs/*.md'
           file_pattern: 'docs/*.md'

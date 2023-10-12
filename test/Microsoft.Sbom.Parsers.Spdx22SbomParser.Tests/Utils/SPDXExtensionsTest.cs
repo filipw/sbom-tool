@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -101,7 +101,7 @@ public class SPDXExtensionsTest
     {
         var name = "test";
         var hash = "ea70261b02144d5234ae990fa0ca4e0bcd8dc2a9";
-        var checksum = new Checksum { Algorithm = AlgorithmName.SHA1, ChecksumValue = hash };
+        var checksum = new Microsoft.Sbom.Contracts.Checksum { Algorithm = AlgorithmName.SHA1, ChecksumValue = hash };
 
         var reference = new SpdxExternalDocumentReference();
         var id = reference.AddExternalReferenceSpdxId(name, new Checksum[] { checksum });
@@ -118,7 +118,7 @@ public class SPDXExtensionsTest
         var spdxId = spdxPackage.AddSpdxId(packageInfo);
 
         Assert.AreEqual(spdxId, spdxPackage.SpdxId);
-        Assert.IsTrue(spdxId.StartsWith(spdxIdPrefex, StringComparison.Ordinal));
+        Assert.IsTrue(spdxId.StartsWith(spdxIdPrefex));
         Assert.IsTrue(spdxIdAllowedCharsRegex.IsMatch(spdxId.Split(spdxIdPrefex)[1]));
     }
 
@@ -141,7 +141,7 @@ public class SPDXExtensionsTest
         {
             var value = referenceCategory.ToNormalizedString();
             Assert.IsFalse(
-                value.Contains('_'),
+                value.Contains('_'), 
                 $"The value {value} of the {nameof(ReferenceCategory)} enum contains an underscore character.");
         }
     }

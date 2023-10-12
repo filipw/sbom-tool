@@ -16,11 +16,11 @@ public class CreationInfo
     /// </summary>
     [JsonPropertyName("created")]
     public string Created { get; set; }
-
+        
     /// <summary>
     /// Gets or sets a list of strings that specify metadata about the creators of this
     /// SBOM. This could be the person or organization name, or tool name, etc.
     /// </summary>
     [JsonPropertyName("creators")]
-    public IEnumerable<string> Creators { get; set; }
+    public List<string> Creators { get; set; }
 }

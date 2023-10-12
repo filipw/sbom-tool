@@ -22,7 +22,7 @@ public class FilesValidator
 {
     private readonly DirectoryWalker directoryWalker;
     private readonly IConfiguration configuration;
-    private readonly ChannelUtils channelUtils = new();
+    private readonly ChannelUtils channelUtils = new ();
     private readonly ILogger log;
     private readonly FileHasher fileHasher;
     private readonly ManifestFolderFilterer fileFilterer;
@@ -70,16 +70,16 @@ public class FilesValidator
         results.AddRange(inSbomFileResults);
         errors.AddRange(inSbomFileErrors);
 
-        var successCount = 0;
-        var resultChannel = channelUtils.Merge(results.ToArray());
-        await foreach (var validationResult in resultChannel.ReadAllAsync())
+        int successCount = 0;
+        ChannelReader<FileValidationResult> resultChannel = channelUtils.Merge(results.ToArray());
+        await foreach (FileValidationResult validationResult in resultChannel.ReadAllAsync())
         {
             successCount++;
         }
 
-        var workflowErrors = channelUtils.Merge(errors.ToArray());
+        ChannelReader<FileValidationResult> workflowErrors = channelUtils.Merge(errors.ToArray());
 
-        await foreach (var error in workflowErrors.ReadAllAsync())
+        await foreach (FileValidationResult error in workflowErrors.ReadAllAsync())
         {
             failures.Add(error.Path, error);
         }
@@ -150,7 +150,7 @@ public class FilesValidator
     {
         var errors = new List<ChannelReader<FileValidationResult>>();
         var filesWithHashes = new List<ChannelReader<FileValidationResult>>();
-
+            
         // Enumerate files from SBOM
         var (sbomFiles, sbomFileErrors) = enumeratorChannel.Enumerate(sbomParser.GetFiles);
         errors.Add(sbomFileErrors);

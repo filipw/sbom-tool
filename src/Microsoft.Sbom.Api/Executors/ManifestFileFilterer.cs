@@ -54,7 +54,7 @@ public class ManifestFileFilterer
             {
                 try
                 {
-                    var file = fileSystemUtils.JoinPaths(configuration.BuildDropPath.Value, manifestFile);
+                    string file = fileSystemUtils.JoinPaths(configuration.BuildDropPath.Value, manifestFile);
                     if (!rootPathFilter.IsValid(file))
                     {
                         // This path is filtered, remove from the manifest map.

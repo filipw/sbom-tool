@@ -28,9 +28,7 @@ public class SerilogLoggerConverter<T> : ILogger<T>
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
     {
         var serilogLogLevel = ConvertLogLevel(logLevel);
-
-        // Check the log level before logging
-        if (serilogLogger.IsEnabled(serilogLogLevel))
+        if (serilogLogger.IsEnabled(serilogLogLevel)) // Check the log level before logging
         {
             serilogLogger.Write(serilogLogLevel, exception, formatter(state, exception));
         }

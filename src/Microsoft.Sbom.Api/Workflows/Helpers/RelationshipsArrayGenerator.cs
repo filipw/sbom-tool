@@ -54,7 +54,7 @@ public class RelationshipsArrayGenerator : IJsonArrayGenerator<RelationshipsArra
             foreach (var manifestInfo in sbomConfigs.GetManifestInfos())
             {
                 var sbomConfig = sbomConfigs.Get(manifestInfo);
-                if (sbomConfig.MetadataBuilder.TryGetRelationshipsHeaderName(out var relationshipArrayHeaderName))
+                if (sbomConfig.MetadataBuilder.TryGetRelationshipsHeaderName(out string relationshipArrayHeaderName))
                 {
                     sbomConfig.JsonSerializer.StartJsonArray(relationshipArrayHeaderName);
 
@@ -97,9 +97,9 @@ public class RelationshipsArrayGenerator : IJsonArrayGenerator<RelationshipsArra
                     };
 
                     // Collect all the json elements and write to the serializer.
-                    var count = 0;
+                    int count = 0;
 
-                    await foreach (var jsonDoc in channelUtils.Merge(jsonChannelsArray).ReadAllAsync())
+                    await foreach (JsonDocument jsonDoc in channelUtils.Merge(jsonChannelsArray).ReadAllAsync())
                     {
                         count++;
                         sbomConfig.JsonSerializer.Write(jsonDoc);

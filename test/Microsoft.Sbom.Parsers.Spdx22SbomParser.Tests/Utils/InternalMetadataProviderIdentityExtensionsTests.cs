@@ -47,14 +47,14 @@ public class InternalMetadataProviderIdentityExtensionsTests
     public void GetPackageVersion_WherePackageVersionIsValid_ReturnPackageVersion()
     {
         var mdProviderMock = new Mock<IInternalMetadataProvider>();
-        var packageVersion = "version";
+        string packageVersion = "version";
 
         mdProviderMock.Setup(m => m.TryGetMetadata(MetadataKey.PackageVersion, out packageVersion))
             .Returns(true);
 
         var actualPackageVersion = mdProviderMock.Object.GetPackageVersion();
 
-        Assert.AreEqual(packageVersion, actualPackageVersion);
+        Assert.AreEqual(packageVersion as string, actualPackageVersion);
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public class InternalMetadataProviderIdentityExtensionsTests
     [DataRow(" ", false)]
     public void GetPackageVersion_WherePackageVersionIsNullOrWhitespace_ReturnBuildId(string packageVersion, bool versionExist)
     {
-        var buildId = "buildId";
+        string buildId = "buildId";
         var mdProviderMock = new Mock<IInternalMetadataProvider>();
 
         mdProviderMock.Setup(m => m.TryGetMetadata(MetadataKey.PackageVersion, out packageVersion))
@@ -105,14 +105,14 @@ public class InternalMetadataProviderIdentityExtensionsTests
     public void GetPackageName_WherePackageNameIsValid_ReturnPackageName()
     {
         var mdProviderMock = new Mock<IInternalMetadataProvider>();
-        var packageName = "name";
+        string packageName = "name";
 
         mdProviderMock.Setup(m => m.TryGetMetadata(MetadataKey.PackageName, out packageName))
             .Returns(true);
 
         var actualPackageName = mdProviderMock.Object.GetPackageName();
 
-        Assert.AreEqual(packageName, actualPackageName);
+        Assert.AreEqual(packageName as string, actualPackageName);
     }
 
     [TestMethod]
@@ -121,7 +121,7 @@ public class InternalMetadataProviderIdentityExtensionsTests
     [DataRow(" ", false)]
     public void GetPackageName_WherePackageNameIsNullOrWhitespace_ReturnBuildDef(string packageName, bool nameExist)
     {
-        var buildDef = "buildDef";
+        string buildDef = "buildDef";
         var mdProviderMock = new Mock<IInternalMetadataProvider>();
 
         mdProviderMock.Setup(m => m.TryGetMetadata(MetadataKey.PackageVersion, out packageName))
@@ -163,14 +163,14 @@ public class InternalMetadataProviderIdentityExtensionsTests
     public void GetSwidPurl_Succeeds()
     {
         var mdProviderMock = new Mock<IInternalMetadataProvider>();
-        var tagId = Guid.NewGuid();
+        Guid tagId = Guid.NewGuid();
 
-        var packageName = "name";
-        var packageVersion = "1.0.0";
+        string packageName = "name";
+        string packageVersion = "1.0.0";
         object packageSupplier = "Microsoft";
-        var namespaceUri = new Uri("https://test.com/");
-        var expectedSwidPurlPattern = @"^pkg:swid\/Microsoft\/test.com\/name@1\.0\.0\?tag_id=.*";
-
+        Uri namespaceUri = new Uri("https://test.com/");
+        string expectedSwidPurlPattern = @"^pkg:swid\/Microsoft\/test.com\/name@1\.0\.0\?tag_id=.*";
+  
         mdProviderMock.Setup(m => m.TryGetMetadata(MetadataKey.PackageSupplier, out packageSupplier))
             .Returns(true);
         mdProviderMock.Setup(m => m.TryGetMetadata(MetadataKey.PackageVersion, out packageVersion))

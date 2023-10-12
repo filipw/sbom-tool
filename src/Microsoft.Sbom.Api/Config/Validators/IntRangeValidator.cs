@@ -23,7 +23,7 @@ public class IntRangeValidator : ConfigValidator
     {
         if (paramValue != null && paramValue is int value)
         {
-            var intRangeAttribute = attribute as IntRangeAttribute;
+            IntRangeAttribute intRangeAttribute = attribute as IntRangeAttribute;
 
             if (value < intRangeAttribute.MinRange || value > intRangeAttribute.MaxRange)
             {

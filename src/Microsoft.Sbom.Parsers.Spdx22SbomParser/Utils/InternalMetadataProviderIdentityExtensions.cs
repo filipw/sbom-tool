@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -21,7 +21,7 @@ public static class InternalMetadataProviderIdentityExtensions
     /// <summary>
     /// Get the name of the package. This can be provided directly be the user, or
     /// if not, we can try to generate one based on the build parameters.
-    ///
+    /// 
     /// If we are unable to generate a package name, we throw an <see cref="ArgumentException"/>
     /// exception.
     /// </summary>
@@ -45,7 +45,7 @@ public static class InternalMetadataProviderIdentityExtensions
             return buildDefName;
         }
 
-        // Right now we don't have any better way to name the package. Throw an exception for the user to
+        // Right now we don't have any better way to name the package. Throw an exception for the user to 
         // provide a package name.
         throw new ArgumentException($"Unable to generate a package name based on provided parameters. " +
                                     $"Please provide the package name in the 'PackageName' parameter.");
@@ -53,7 +53,7 @@ public static class InternalMetadataProviderIdentityExtensions
 
     /// <summary>
     /// Generates the package verification code for a given package using the SPDX 2.2 specification.
-    ///
+    /// 
     /// Algorithm defined here https://spdx.github.io/spdx-spec/3-package-information/#39-package-verification-code.
     /// </summary>
     /// <param name="internalMetadataProvider"></param>
@@ -109,7 +109,7 @@ public static class InternalMetadataProviderIdentityExtensions
     /// <summary>
     /// Get the version of the package. This can be provided directly be the user, or
     /// if not, we can try to generate one based on the build parameters.
-    ///
+    /// 
     /// If we are unable to generate a package name, we throw an <see cref="ArgumentException"/>
     /// exception.
     /// </summary>
@@ -133,7 +133,7 @@ public static class InternalMetadataProviderIdentityExtensions
             return buildId;
         }
 
-        // Right now we don't have any better way to version the package. Throw an exception for the user to
+        // Right now we don't have any better way to version the package. Throw an exception for the user to 
         // provide a package version.
         throw new ArgumentException($"Unable to generate a package version based on provided parameters. " +
                                     $"Please provide the package version in the 'PackageVersion' parameter.");
@@ -152,12 +152,12 @@ public static class InternalMetadataProviderIdentityExtensions
             return packageSupplier as string;
         }
 
-        // Right now we don't have any better way to version the package. Throw an exception for the user to
+        // Right now we don't have any better way to version the package. Throw an exception for the user to 
         // provide a package version.
         throw new ArgumentException($"Unable to generate a package supplier based on provided parameters. " +
                                     $"Please provide the package supplier in the 'PackageSupplier' parameter.");
     }
-
+ 
     public static string GetDocumentNamespace(this IInternalMetadataProvider internalMetadataProvider)
     {
         if (internalMetadataProvider is null)
@@ -175,16 +175,16 @@ public static class InternalMetadataProviderIdentityExtensions
             throw new ArgumentNullException(nameof(internalMetadataProvider));
         }
 
-        var rootPackageVersion = Uri.EscapeDataString(internalMetadataProvider.GetPackageVersion());
-        var packageSupplierFromMetadata = Uri.EscapeDataString(internalMetadataProvider.GetPackageSupplier());
-        var rootPackageName = Uri.EscapeDataString(internalMetadataProvider.GetPackageName());
+        string rootPackageVersion = Uri.EscapeDataString(internalMetadataProvider.GetPackageVersion());
+        string packageSupplierFromMetadata = Uri.EscapeDataString(internalMetadataProvider.GetPackageSupplier());
+        string rootPackageName = Uri.EscapeDataString(internalMetadataProvider.GetPackageName());
 
-        var namespaceUri = new Uri(internalMetadataProvider.GetSBOMNamespaceUri());
+        Uri namespaceUri = new Uri(internalMetadataProvider.GetSBOMNamespaceUri());
 
         // Generate a guid for the new swid tag Id.
-        var tagId = Guid.NewGuid().ToString();
+        string tagId = Guid.NewGuid().ToString();
 
-        var swidPurl = $"pkg:swid/{packageSupplierFromMetadata}/{namespaceUri.Host}/{rootPackageName}@{rootPackageVersion}?tag_id={tagId}";
+        string swidPurl = $"pkg:swid/{packageSupplierFromMetadata}/{namespaceUri.Host}/{rootPackageName}@{rootPackageVersion}?tag_id={tagId}";
 
         return swidPurl;
     }

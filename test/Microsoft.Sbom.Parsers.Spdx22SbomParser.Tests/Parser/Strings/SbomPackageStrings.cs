@@ -1,7 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-namespace Microsoft.Sbom.Parser.Strings;
+﻿namespace Microsoft.Sbom.Parser.Strings;
 
 internal struct SbomPackageStrings
 {
@@ -42,7 +39,7 @@ internal struct SbomPackageStrings
       ""licenseConcluded"": ""NOASSERTION"",
       ""licenseInfoFromFiles"": [
         ""NOASSERTION""
-      ],
+      ], 
       ""additionalProperty"": [
         {""childAddtionalProperty"": ""Additional property value"" }],
       ""licenseDeclared"": ""NOASSERTION"",
@@ -67,7 +64,7 @@ internal struct SbomPackageStrings
       ""licenseConcluded"": ""NOASSERTION"",
       ""licenseInfoFromFiles"": [
         ""NOASSERTION""
-      ],
+      ], 
       ""additionalProperty"": [""Additional value 1"", ""Additional value 2""],
       ""licenseDeclared"": ""NOASSERTION"",
       ""copyrightText"": ""NOASSERTION"",
@@ -93,7 +90,7 @@ internal struct SbomPackageStrings
         ""NOASSERTION""
       ],
       ""additionalProperty"": {
-        ""childAddtionalProperty"": ""Additional property value""
+        ""childAddtionalProperty"": ""Additional property value"" 
       },
       ""licenseDeclared"": ""NOASSERTION"",
       ""copyrightText"": ""NOASSERTION"",

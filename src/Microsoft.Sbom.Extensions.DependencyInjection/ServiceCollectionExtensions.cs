@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Concurrent;
@@ -28,7 +28,6 @@ using Microsoft.ComponentDetection.Orchestrator.Experiments;
 using Microsoft.ComponentDetection.Orchestrator.Services;
 using Microsoft.ComponentDetection.Orchestrator.Services.GraphTranslation;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Sbom.Api;
 using Microsoft.Sbom.Api.Config;
@@ -60,7 +59,6 @@ using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
-using Serilog.Filters;
 using IComponentDetector = Microsoft.ComponentDetection.Contracts.IComponentDetector;
 using ILogger = Serilog.ILogger;
 
@@ -86,15 +84,15 @@ public static class ServiceCollectionExtensions
         services
             .AddSingleton<IConfiguration, Configuration>()
             .AddTransient(_ => FileSystemUtilsProvider.CreateInstance())
-            .AddTransient(x =>
+            .AddTransient<ILogger>(x =>
             {
                 logLevel = x.GetService<InputConfiguration>()?.Verbosity?.Value ?? logLevel;
                 return Log.Logger = new LoggerConfiguration()
-                    .Filter.ByExcluding(Matching.FromSource("System.Net.Http.HttpClient"))
                     .MinimumLevel.ControlledBy(new LoggingLevelSwitch { MinimumLevel = logLevel })
                     .WriteTo.Console(outputTemplate: Api.Utils.Constants.LoggerTemplate)
                     .CreateBootstrapLogger();
             })
+            .AddTransient<IWorkflow<SbomValidationWorkflow>, SbomValidationWorkflow>()
             .AddTransient<IWorkflow<SbomParserBasedValidationWorkflow>, SbomParserBasedValidationWorkflow>()
             .AddTransient<IWorkflow<SbomGenerationWorkflow>, SbomGenerationWorkflow>()
             .AddTransient<DirectoryWalker>()
@@ -134,7 +132,6 @@ public static class ServiceCollectionExtensions
             .AddTransient<FileListEnumerator>()
             .AddTransient<ISBOMReaderForExternalDocumentReference, SPDXSBOMReaderForExternalDocumentReference>()
             .AddTransient<SBOMMetadata>()
-            .AddTransient<ILicenseInformationService, LicenseInformationService>()
             .AddSingleton<IOSUtils, OSUtils>()
             .AddSingleton<IEnvironmentWrapper, EnvironmentWrapper>()
             .AddSingleton<IFileSystemUtilsExtension, FileSystemUtilsExtension>()
@@ -151,7 +148,6 @@ public static class ServiceCollectionExtensions
             .AddSingleton<IHashAlgorithmProvider, HashAlgorithmProvider>()
             .AddSingleton<IAssemblyConfig, AssemblyConfig>()
             .AddSingleton<ComponentDetectorCachedExecutor>()
-            .AddSingleton<ILicenseInformationFetcher, LicenseInformationFetcher>()
             .AddSingleton<InternalSBOMFileInfoDeduplicator>()
             .AddSingleton<ExternalReferenceInfoToPathConverter>()
             .AddSingleton<ExternalReferenceDeduplicator>()
@@ -170,15 +166,14 @@ public static class ServiceCollectionExtensions
                     typeof(IManifestInterface)))
                 .AsImplementedInterfaces())
             .AddScoped<ISBOMGenerator, SbomGenerator>()
-            .AddScoped<ISBOMValidator, SbomValidator>()
             .AddSingleton(x =>
             {
-                var fileSystemUtils = x.GetRequiredService<IFileSystemUtils>();
-                var sbomConfigs = x.GetRequiredService<ISbomConfigProvider>();
-                var osUtils = x.GetRequiredService<IOSUtils>();
-                var configuration = x.GetRequiredService<IConfiguration>();
+                IFileSystemUtils fileSystemUtils = x.GetRequiredService<IFileSystemUtils>();
+                ISbomConfigProvider sbomConfigs = x.GetRequiredService<ISbomConfigProvider>();
+                IOSUtils osUtils = x.GetRequiredService<IOSUtils>();
+                IConfiguration configuration = x.GetRequiredService<IConfiguration>();
 
-                var manifestData = new ManifestData();
+                ManifestData manifestData = new ManifestData();
 
                 if (!configuration.ManifestInfo.Value.Contains(Api.Utils.Constants.SPDX22ManifestInfo))
                 {
@@ -194,8 +189,7 @@ public static class ServiceCollectionExtensions
             .ConfigureLoggingProviders()
             .ConfigureComponentDetectors()
             .ConfigureComponentDetectionSharedServices()
-            .ConfigureComponentDetectionCommandLineServices(logLevel)
-            .AddHttpClient<LicenseInformationService>();
+            .ConfigureComponentDetectionCommandLineServices(logLevel);
 
         return services;
     }
@@ -232,20 +226,20 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IBcdeScanExecutionService, BcdeScanExecutionService>();
         services.AddSingleton<IDetectorProcessingService, DetectorProcessingService>();
         services.AddSingleton<ILogger<DetectorProcessingService>>(x =>
-        {
-            if (logLevel == LogEventLevel.Warning || logLevel == LogEventLevel.Error || logLevel == LogEventLevel.Fatal)
-            {
-                logLevel = LogEventLevel.Information;
-            }
-
-            // Customize the logging configuration for Orchestrator here
-            Log.Logger = new LoggerConfiguration()
-               .MinimumLevel.ControlledBy(new LoggingLevelSwitch { MinimumLevel = logLevel })
-               .WriteTo.Console(outputTemplate: Api.Utils.Constants.LoggerTemplate)
-               .CreateBootstrapLogger();
-
-            return new SerilogLoggerConverter<DetectorProcessingService>(Log.Logger);
-        });
+         {
+             if (logLevel == LogEventLevel.Warning || logLevel == LogEventLevel.Error || logLevel == LogEventLevel.Fatal)
+             {
+                 logLevel = LogEventLevel.Information;
+             }
+             
+             // Customize the logging configuration for Orchestrator here
+             Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.ControlledBy(new LoggingLevelSwitch { MinimumLevel = logLevel })
+                .WriteTo.Console(outputTemplate: Api.Utils.Constants.LoggerTemplate)
+                .CreateBootstrapLogger();
+             
+             return new SerilogLoggerConverter<DetectorProcessingService>(Log.Logger);
+         });
         services.AddSingleton<IDetectorRestrictionService, DetectorRestrictionService>();
         services.AddSingleton<IArgumentHelper, ArgumentHelper>();
 

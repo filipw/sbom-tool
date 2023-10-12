@@ -22,7 +22,7 @@ public class HashCodeGenerator : IHashCodeGenerator
     }
 
     /// <summary>
-    /// Given a file path, returns a list of <see cref="Checksum"/>for the file
+    /// Given a file path, returns a list of <see cref="Checksum"/>for the file 
     /// for each hash algorithm name provided in <paramref name="hashAlgorithmNames"/>.
     /// </summary>
     /// <param name="filePath">The path of the file.</param>
@@ -31,7 +31,7 @@ public class HashCodeGenerator : IHashCodeGenerator
     public Checksum[] GenerateHashes(string filePath, AlgorithmName[] hashAlgorithmNames)
     {
         var fileHashes = new Checksum[hashAlgorithmNames.Length];
-        var i = 0;
+        int i = 0;
 
         using var bufferedStream = new BufferedStream(fileSystemUtils.OpenRead(filePath), 1024 * 32);
 

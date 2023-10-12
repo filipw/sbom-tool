@@ -3,7 +3,6 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Sbom.Api.Entities;
@@ -59,7 +58,7 @@ public class FileFilterer
     private async Task FilterFiles(InternalSbomFileInfo file, Channel<FileValidationResult> errors, Channel<InternalSbomFileInfo> output)
     {
         try
-        {
+        {                
             // Resolve ../ in paths to absolute paths.
             var fullPath = Path.GetFullPath(fileSystemUtils.JoinPaths(configuration.BuildDropPath.Value, file.Path));
 
@@ -77,7 +76,7 @@ public class FileFilterer
                     });
 
                     return;
-                }
+                }          
             }
 
             // Filter paths that are not present on disk.
@@ -92,7 +91,7 @@ public class FileFilterer
                 return;
             }
 
-            await output.Writer.WriteAsync(file);
+            await output.Writer.WriteAsync(file);   
         }
         catch (Exception e)
         {

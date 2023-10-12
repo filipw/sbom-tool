@@ -50,16 +50,12 @@ public class ExternalDocumentReferenceWriterTest
             Recorder = new SbomPackageDetailsRecorder()
         };
 
-        var externalDocumentReferenceInfo = new ExternalDocumentReferenceInfo
-        {
-            ExternalDocumentName = "name",
-            DocumentNamespace = "namespace"
-        };
-        var checksum = new Checksum
-        {
-            Algorithm = AlgorithmName.SHA1,
-            ChecksumValue = "abc"
-        };
+        ExternalDocumentReferenceInfo externalDocumentReferenceInfo = new ExternalDocumentReferenceInfo();
+        externalDocumentReferenceInfo.ExternalDocumentName = "name";
+        externalDocumentReferenceInfo.DocumentNamespace = "namespace";
+        var checksum = new Checksum();
+        checksum.Algorithm = AlgorithmName.SHA1;
+        checksum.ChecksumValue = "abc";
         externalDocumentReferenceInfo.Checksum = new List<Checksum> { checksum };
 
         var externalDocumentReferenceInfos = new List<ExternalDocumentReferenceInfo> { externalDocumentReferenceInfo };
@@ -76,11 +72,11 @@ public class ExternalDocumentReferenceWriterTest
 
         await foreach (var result in results.ReadAllAsync())
         {
-            var root = result.Document.RootElement;
+            JsonElement root = result.Document.RootElement;
 
             Assert.IsNotNull(root);
 
-            if (root.TryGetProperty("Document", out var documentNamespace))
+            if (root.TryGetProperty("Document", out JsonElement documentNamespace))
             {
                 Assert.AreEqual("namespace", documentNamespace.GetString());
             }
@@ -89,7 +85,7 @@ public class ExternalDocumentReferenceWriterTest
                 Assert.Fail("Document property not found");
             }
 
-            if (root.TryGetProperty("ExternalDocumentId", out var externalDocumentId))
+            if (root.TryGetProperty("ExternalDocumentId", out JsonElement externalDocumentId))
             {
                 Assert.AreEqual("name", externalDocumentId.GetString());
             }

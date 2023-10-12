@@ -29,9 +29,9 @@ public class InternalSbomFileInfo
     public string LicenseConcluded { get; set; }
 
     /// <summary>
-    /// Gets or sets contains any license information actually found in the file.
+    /// Gets or sets contains any license information actually found in the file. 
     /// </summary>
-    public IEnumerable<string> LicenseInfoInFiles { get; set; }
+    public List<string> LicenseInfoInFiles { get; set; }
 
     /// <summary>
     /// Gets or sets the relative path to the BuildDropPath of the file in the SBOM.
@@ -46,7 +46,7 @@ public class InternalSbomFileInfo
     /// <summary>
     /// Gets or sets contains the list of file types for this file.
     /// </summary>
-    public IEnumerable<FileType> FileTypes { get; set; }
+    public List<FileType> FileTypes { get; set; }
 
     /// <summary>
     /// Gets or sets the source location type of this file.

@@ -18,7 +18,7 @@ public static class FileSystemUtilsProvider
     /// <returns></returns>
     public static IFileSystemUtils CreateInstance()
     {
-        var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+        bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         return isWindows ? new WindowsFileSystemUtils() : new UnixFileSystemUtils();
     }
 }

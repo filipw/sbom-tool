@@ -13,7 +13,7 @@ public class AdapterReport
     /// <summary>
     /// Set of reported items for an adapter.
     /// </summary>
-    public readonly ICollection<AdapterReportItem> Report;
+    public readonly List<AdapterReportItem> Report;
 
     /// <nodoc/>
     public AdapterReport()

@@ -26,8 +26,8 @@ public class FileValidationResult
     // TODO: Deprecate FileValidationResult to use EntityError
     public EntityError ToEntityError()
     {
-        var errorType = EntityErrorType.Other;
-        var entityType = EntityType.Unknown;
+        EntityErrorType errorType = EntityErrorType.Other;
+        EntityType entityType = EntityType.Unknown;
         Entity entity = null;
 
         switch (ErrorType)

@@ -46,15 +46,16 @@ public class PackageArrayGenerator : IJsonArrayGenerator<PackageArrayGenerator>
         {
             IList<FileValidationResult> totalErrors = new List<FileValidationResult>();
 
-            var sourcesProvider = this.sourcesProviders
-                .FirstOrDefault(s => s.IsSupported(ProviderType.Packages));
+            ISourcesProvider sourcesProvider = sourcesProviders
+                .Where(s => s.IsSupported(ProviderType.Packages))
+                .FirstOrDefault();
 
             // Write the start of the array, if supported.
             IList<ISbomConfig> packagesArraySupportingConfigs = new List<ISbomConfig>();
             foreach (var manifestInfo in sbomConfigs.GetManifestInfos())
             {
                 var config = sbomConfigs.Get(manifestInfo);
-                if (config.MetadataBuilder.TryGetPackageArrayHeaderName(out var packagesArrayHeaderName))
+                if (config.MetadataBuilder.TryGetPackageArrayHeaderName(out string packagesArrayHeaderName))
                 {
                     packagesArraySupportingConfigs.Add(config);
                     config.JsonSerializer.StartJsonArray(packagesArrayHeaderName);
@@ -64,9 +65,9 @@ public class PackageArrayGenerator : IJsonArrayGenerator<PackageArrayGenerator>
             var (jsonDocResults, errors) = sourcesProvider.Get(packagesArraySupportingConfigs);
 
             // 6. Collect all the json elements and write to the serializer.
-            var totalJsonDocumentsWritten = 0;
+            int totalJsonDocumentsWritten = 0;
 
-            await foreach (var jsonDocResult in jsonDocResults.ReadAllAsync())
+            await foreach (JsonDocWithSerializer jsonDocResult in jsonDocResults.ReadAllAsync())
             {
                 jsonDocResult.Serializer.Write(jsonDocResult.Document);
                 totalJsonDocumentsWritten++;
@@ -81,15 +82,15 @@ public class PackageArrayGenerator : IJsonArrayGenerator<PackageArrayGenerator>
 
             // +1 is added to the totalJsonDocumentsWritten to account for the root package of the SBOM.
             recorder.RecordTotalNumberOfPackages(totalJsonDocumentsWritten + 1);
-            await foreach (var error in errors.ReadAllAsync())
+            await foreach (FileValidationResult error in errors.ReadAllAsync())
             {
                 totalErrors.Add(error);
             }
 
-            foreach (var sbomConfig in packagesArraySupportingConfigs)
+            foreach (ISbomConfig sbomConfig in packagesArraySupportingConfigs)
             {
                 // Write the root package information to the packages array.
-                if (sbomConfig.MetadataBuilder.TryGetRootPackageJson(sbomConfigs, out var generationResult))
+                if (sbomConfig.MetadataBuilder.TryGetRootPackageJson(sbomConfigs, out GenerationResult generationResult))
                 {
                     sbomConfig.JsonSerializer.Write(generationResult?.Document);
                     sbomConfig.Recorder.RecordRootPackageId(generationResult?.ResultMetadata?.EntityId);

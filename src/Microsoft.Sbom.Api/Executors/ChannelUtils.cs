@@ -24,7 +24,7 @@ public class ChannelUtils
         {
             async Task Redirect(ChannelReader<T> input)
             {
-                await foreach (var item in input.ReadAllAsync())
+                await foreach (T item in input.ReadAllAsync())
                 {
                     await output.Writer.WriteAsync(item);
                 }
@@ -56,13 +56,13 @@ public class ChannelUtils
         {
             var index = 0;
 
-            await foreach (var item in input.ReadAllAsync())
+            await foreach (T item in input.ReadAllAsync())
             {
                 await outputs[index].Writer.WriteAsync(item);
                 index = (index + 1) % n;
             }
 
-            foreach (var ch in outputs)
+            foreach (Channel<T> ch in outputs)
             {
                 ch.Writer.Complete();
             }

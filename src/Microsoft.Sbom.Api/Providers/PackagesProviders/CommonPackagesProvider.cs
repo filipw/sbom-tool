@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -30,8 +30,7 @@ public abstract class CommonPackagesProvider<T> : EntityToJsonProviderBase<T>
         ChannelUtils channelUtils,
         ILogger logger,
         ISbomConfigProvider sbomConfigs,
-        PackageInfoJsonWriter packageInfoJsonWriter,
-        ILicenseInformationFetcher licenseInformationFetcher)
+        PackageInfoJsonWriter packageInfoJsonWriter)
         : base(configuration, channelUtils, logger)
     {
         this.sbomConfigs = sbomConfigs ?? throw new ArgumentNullException(nameof(sbomConfigs));
@@ -54,7 +53,7 @@ public abstract class CommonPackagesProvider<T> : EntityToJsonProviderBase<T>
                     sbomConfigs.TryGetMetadata(MetadataKey.ImageVersion, out object imageVersionObj))
                 {
                     Log.Debug($"Adding the image OS package to the packages list as a dependency.");
-                    var name = $"Azure Pipelines Hosted Image {imageOsObj}";
+                    string name = $"Azure Pipelines Hosted Image {imageOsObj}";
                     await packageInfos.Writer.WriteAsync(new SbomPackage()
                     {
                         PackageName = name,

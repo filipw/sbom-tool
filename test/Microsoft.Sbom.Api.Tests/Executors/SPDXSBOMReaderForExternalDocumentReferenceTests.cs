@@ -64,10 +64,10 @@ public class SPDXSBOMReaderForExternalDocumentReferenceTests
                         })
                     .ToArray());
 
-        var json = "{\"name\": \"docname\",\"documentNamespace\": \"namespace\", \"spdxVersion\": \"SPDX-2.2\", \"documentDescribes\":[\"SPDXRef - RootPackage\"]}";
+        string json = "{\"name\": \"docname\",\"documentNamespace\": \"namespace\", \"spdxVersion\": \"SPDX-2.2\", \"documentDescribes\":[\"SPDXRef - RootPackage\"]}";
         fileSystemMock.Setup(f => f.OpenRead(It.IsAny<string>())).Returns(TestUtils.GenerateStreamFromString(json));
 
-        var sbomLocations = new List<string>
+        List<string> sbomLocations = new List<string>
         {
             @"d:\directorya\directoryb\file1.spdx.json"
         };
@@ -82,7 +82,7 @@ public class SPDXSBOMReaderForExternalDocumentReferenceTests
 
         var spdxSBOMReaderForExternalDocumentReference = new SPDXSBOMReaderForExternalDocumentReference(mockHashGenerator.Object, mockLogger.Object, sbomConfigs, manifestGeneratorProvider, fileSystemMock.Object);
         var (output, errors) = spdxSBOMReaderForExternalDocumentReference.ParseSBOMFile(sbomLocationChannel);
-        await foreach (var externalDocumentReferenceInfo in output.ReadAllAsync())
+        await foreach (ExternalDocumentReferenceInfo externalDocumentReferenceInfo in output.ReadAllAsync())
         {
             Assert.AreEqual("namespace", externalDocumentReferenceInfo.DocumentNamespace);
         }
@@ -102,10 +102,10 @@ public class SPDXSBOMReaderForExternalDocumentReferenceTests
                             Algorithm = a
                         })
                     .ToArray());
-        var json = "{\"name\": ,\"documentNamespace\": \"namespace\"}";
+        string json = "{\"name\": ,\"documentNamespace\": \"namespace\"}";
         fileSystemMock.Setup(f => f.OpenRead(It.IsAny<string>())).Returns(TestUtils.GenerateStreamFromString(json));
 
-        var sbomLocations = new List<string>
+        List<string> sbomLocations = new List<string>
         {
             @"d:\directorya\directoryb\file1.spdx.json"
         };
@@ -128,7 +128,7 @@ public class SPDXSBOMReaderForExternalDocumentReferenceTests
     [TestMethod]
     public async Task When_ParseSBOMFile_WithNonSPDXFile_ThenDoNotReadFiles()
     {
-        var nonSpdxSbomLocations = new List<string>
+        List<string> nonSpdxSbomLocations = new List<string>
         {
             @"d:\directorya\directoryb\file1.json"
         };
@@ -171,7 +171,7 @@ public class SPDXSBOMReaderForExternalDocumentReferenceTests
 
         fileSystemMock.Setup(f => f.OpenRead(It.IsAny<string>())).Returns(TestUtils.GenerateStreamFromString(inputJson));
 
-        var sbomLocations = new List<string>
+        List<string> sbomLocations = new List<string>
         {
             @"d:\directorya\directoryb\file1.spdx.json"
         };

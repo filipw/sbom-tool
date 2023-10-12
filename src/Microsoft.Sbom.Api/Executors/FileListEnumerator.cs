@@ -73,14 +73,14 @@ public class FileListEnumerator
             }
 
             // Split on Environment.NewLine and discard blank lines.
-            var separator = new string[] { Environment.NewLine };
-            var files = allText.Split(separator, StringSplitOptions.None)
+            string[] separator = new string[] { Environment.NewLine };
+            IEnumerable<string> files = allText.Split(separator, StringSplitOptions.None)
                 .Where(t => !string.IsNullOrEmpty(t));
             foreach (var oneFile in files)
             {
                 try
                 {
-                    var absoluteFileName = fileSystemUtils.AbsolutePath(oneFile);
+                    string absoluteFileName = fileSystemUtils.AbsolutePath(oneFile);
                     if (!fileSystemUtils.FileExists(absoluteFileName))
                     {
                         await errors.Writer.WriteAsync(new FileValidationResult

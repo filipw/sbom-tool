@@ -79,9 +79,9 @@ public class SPDXSBOMReaderForExternalDocumentReference : ISBOMReaderForExternal
         Task.Run(async () =>
         {
             IList<ExternalDocumentReferenceInfo> externalDocumentReferenceInfos = new List<ExternalDocumentReferenceInfo>();
-            await foreach (var file in sbomFileLocation.ReadAllAsync())
+            await foreach (string file in sbomFileLocation.ReadAllAsync())
             {
-                if (!file.EndsWith(Constants.SPDXFileExtension, StringComparison.OrdinalIgnoreCase))
+                if (!file.EndsWith(Constants.SPDXFileExtension))
                 {
                     log.Warning($"The file {file} is not an spdx document.");
                 }
@@ -143,15 +143,15 @@ public class SPDXSBOMReaderForExternalDocumentReference : ISBOMReaderForExternal
         checksums = hashCodeGenerator.GenerateHashes(file, HashAlgorithmNames);
 
         using (var openStream = fileSystemUtils.OpenRead(file))
-        using (var doc = JsonDocument.Parse(openStream))
+        using (JsonDocument doc = JsonDocument.Parse(openStream))
         {
-            var root = doc.RootElement;
+            JsonElement root = doc.RootElement;
             string nameValue;
             string documentNamespaceValue;
             string versionValue;
             string rootElementValue;
 
-            if (root.TryGetProperty(Constants.SpdxVersionString, out var version))
+            if (root.TryGetProperty(Constants.SpdxVersionString, out JsonElement version))
             {
                 versionValue = version.GetString();
             }
@@ -165,7 +165,7 @@ public class SPDXSBOMReaderForExternalDocumentReference : ISBOMReaderForExternal
                 throw new Exception($"The SPDX version ${versionValue} is not valid format in the referenced SBOM, we currently only support SPDX-2.2 SBOM format.");
             }
 
-            if (root.TryGetProperty(Constants.NameString, out var name))
+            if (root.TryGetProperty(Constants.NameString, out JsonElement name))
             {
                 nameValue = name.GetString();
             }
@@ -174,7 +174,7 @@ public class SPDXSBOMReaderForExternalDocumentReference : ISBOMReaderForExternal
                 throw new Exception($"{Constants.NameString} property could not be parsed from referenced SPDX Document '{file}'.");
             }
 
-            if (root.TryGetProperty(Constants.DocumentNamespaceString, out var documentNamespace))
+            if (root.TryGetProperty(Constants.DocumentNamespaceString, out JsonElement documentNamespace))
             {
                 documentNamespaceValue = documentNamespace.GetString();
             }
@@ -183,7 +183,7 @@ public class SPDXSBOMReaderForExternalDocumentReference : ISBOMReaderForExternal
                 throw new Exception($"{Constants.DocumentNamespaceString} property could not be parsed from referenced SPDX Document '{file}'.");
             }
 
-            if (root.TryGetProperty(Constants.DocumentDescribesString, out var rootElements))
+            if (root.TryGetProperty(Constants.DocumentDescribesString, out JsonElement rootElements))
             {
                 rootElementValue = rootElements.EnumerateArray().FirstOrDefault().ToString() ?? Constants.DefaultRootElement;
             }

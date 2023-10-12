@@ -23,7 +23,7 @@ public class ArgRevivers
         try
         {
             IList<ManifestInfo> manifestInfos = new List<ManifestInfo>();
-            var values = value.Split(',');
+            string[] values = value.Split(',');
             foreach (var manifestInfoStr in values)
             {
                 manifestInfos.Add(ManifestInfo.Parse(manifestInfoStr));
