@@ -8,7 +8,7 @@ using Microsoft.Sbom.Api.Utils;
 namespace Microsoft.Sbom.Common.Config.Validators;
 
 /// <summary>
-/// Abstract class from which all validators must inherit. 
+/// Abstract class from which all validators must inherit.
 /// This class only validates configuration properties that are of the type <see cref="ConfigurationSetting{T}"/>.
 /// </summary>
 public abstract class ConfigValidator
@@ -44,7 +44,7 @@ public abstract class ConfigValidator
             throw new ArgumentException($"'{nameof(propertyName)}' cannot be null or empty", nameof(propertyName));
         }
 
-        Attribute attribute = attributeCollection[supportedAttribute];
+        var attribute = attributeCollection[supportedAttribute];
         if (attribute == null)
         {
             return;

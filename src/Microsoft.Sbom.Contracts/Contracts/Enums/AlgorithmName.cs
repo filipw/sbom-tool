@@ -10,7 +10,7 @@ namespace Microsoft.Sbom.Contracts.Enums;
 
 /// <summary>
 /// A list of the names of the hash algorithms that are supported by this SBOM api.
-/// We map to <see cref="HashAlgorithmName"/> for standard 
+/// We map to <see cref="HashAlgorithmName"/> for standard
 /// hash algorithms.
 /// </summary>
 public class AlgorithmName : IEquatable<AlgorithmName>
@@ -45,7 +45,7 @@ public class AlgorithmName : IEquatable<AlgorithmName>
 
     public override int GetHashCode()
     {
-        return Name == null ? 0 : Name.GetHashCode();
+        return Name == null ? 0 : Name.GetHashCode(StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool operator ==(AlgorithmName left, AlgorithmName right)

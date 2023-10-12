@@ -32,10 +32,10 @@ public class SbomGenerator : ISBOMGenerator
     private readonly ConfigSanitizer configSanitizer;
 
     public SbomGenerator(
-        IWorkflow<SbomGenerationWorkflow> generationWorkflow, 
-        ManifestGeneratorProvider generatorProvider, 
-        IRecorder recorder, 
-        IEnumerable<ConfigValidator> configValidators, 
+        IWorkflow<SbomGenerationWorkflow> generationWorkflow,
+        ManifestGeneratorProvider generatorProvider,
+        IRecorder recorder,
+        IEnumerable<ConfigValidator> configValidators,
         ConfigSanitizer configSanitizer)
     {
         this.generationWorkflow = generationWorkflow;
@@ -58,8 +58,14 @@ public class SbomGenerator : ISBOMGenerator
         // Get scan configuration
         var inputConfiguration = ApiConfigurationBuilder.GetConfiguration(
             rootPath,
-            manifestDirPath, null, null, metadata, specifications,
-            runtimeConfiguration, externalDocumentReferenceListFile, componentPath);
+            manifestDirPath,
+            null,
+            null,
+            metadata,
+            specifications,
+            runtimeConfiguration,
+            externalDocumentReferenceListFile,
+            componentPath);
 
         // Validate the configuration
         inputConfiguration = ValidateConfig(inputConfiguration);
@@ -68,7 +74,7 @@ public class SbomGenerator : ISBOMGenerator
         inputConfiguration.ToConfiguration();
 
         // This is the generate workflow
-        bool isSuccess = await generationWorkflow.RunAsync();
+        var isSuccess = await generationWorkflow.RunAsync();
 
         await recorder.FinalizeAndLogTelemetryAsync();
 
@@ -99,14 +105,20 @@ public class SbomGenerator : ISBOMGenerator
         ArgumentNullException.ThrowIfNull(manifestDirPath);
 
         var inputConfiguration = ApiConfigurationBuilder.GetConfiguration(
-            rootPath, manifestDirPath, files, packages, metadata, specifications,
-            runtimeConfiguration, externalDocumentReferenceListFile);
+            rootPath,
+            manifestDirPath,
+            files,
+            packages,
+            metadata,
+            specifications,
+            runtimeConfiguration,
+            externalDocumentReferenceListFile);
         inputConfiguration = ValidateConfig(inputConfiguration);
 
         inputConfiguration.ToConfiguration();
 
         // This is the generate workflow
-        bool result = await generationWorkflow.RunAsync();
+        var result = await generationWorkflow.RunAsync();
 
         return new SbomGenerationResult(result, new List<EntityError>());
     }

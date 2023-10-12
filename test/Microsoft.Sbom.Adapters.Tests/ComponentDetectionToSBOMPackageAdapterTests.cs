@@ -1,20 +1,20 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Microsoft.ComponentDetection.Contracts.BcdeModels;
 using Microsoft.ComponentDetection.Contracts.Internal;
 using Microsoft.ComponentDetection.Contracts.TypedComponent;
-using Microsoft.Sbom.Adapters.ComponentDetection;
 using Microsoft.Sbom.Adapters.Report;
 using Microsoft.Sbom.Contracts;
 using Microsoft.Sbom.Contracts.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Sbom.Adapters.Tests;
+
+using Microsoft.Sbom.Adapters.ComponentDetection;
 
 [TestClass]
 public class ComponentDetectionToSBOMPackageAdapterTests
@@ -42,7 +42,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
                                  ""hash"": null,
                                  ""type"": ""Npm"",
                                  ""id"": ""@microsoft/yarn-graph-builder 1.0.0 - Npm"",
-                                 ""author"": { 
+                                 ""author"": {
                                     ""name"": ""some-name""
                                  }
                                },
@@ -61,14 +61,14 @@ public class ComponentDetectionToSBOMPackageAdapterTests
         // Successful conversion
         Assert.IsNotNull(errors.Report);
         Assert.IsTrue(errors.Report?.Count == 1);
-        Assert.IsTrue(errors.Report[0].Type == AdapterReportItemType.Success);
-            
+        Assert.IsTrue(errors.Report.First().Type == AdapterReportItemType.Success);
+
         // Converted packaged is present and valid
         Assert.IsTrue(packages?.Count == 1);
         Assert.IsNotNull(packages[0]);
         Assert.AreEqual(packages[0].PackageName, "@microsoft/yarn-graph-builder");
         Assert.AreEqual(packages[0].PackageVersion, "1.0.0");
-            
+
         // This one contains no checksums, so verify that it is null
         Assert.IsNotNull(packages[0].Checksum);
         var checksums = packages[0].Checksum?.ToList();
@@ -89,7 +89,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
 
         Assert.IsTrue(packages?.Count == 0);
         Assert.IsTrue(errors.Report?.Count == 1); // Should still be successful even with no components
-        Assert.IsTrue(errors.Report[0].Type == AdapterReportItemType.Success);
+        Assert.IsTrue(errors.Report.First().Type == AdapterReportItemType.Success);
     }
 
     [TestMethod]
@@ -99,8 +99,8 @@ public class ComponentDetectionToSBOMPackageAdapterTests
         var (errors, packages) = GenerateJsonFileForTestAndRun(json);
 
         Assert.IsTrue(errors.Report?.Count == 1);
-        Assert.IsTrue(errors.Report[0].Type == AdapterReportItemType.Failure);
-        Assert.IsTrue(errors.Report[0].Details.Contains($"Unable to parse bcde-output.json"));
+        Assert.IsTrue(errors.Report.First().Type == AdapterReportItemType.Failure);
+        Assert.IsTrue(errors.Report.First().Details.Contains("Unable to parse bcde-output.json", StringComparison.Ordinal));
         Assert.IsTrue(packages.Count == 0);
     }
 
@@ -109,7 +109,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     {
         Assert.ThrowsException<ArgumentNullException>(() =>
         {
-            ComponentDetectionToSBOMPackageAdapter adapter = new ComponentDetectionToSBOMPackageAdapter();
+            var adapter = new ComponentDetectionToSBOMPackageAdapter();
             adapter.TryConvert("not/a/real/path");
         });
     }
@@ -118,7 +118,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void CargoComponent_ToSbomPackage()
     {
         var cargoComponent = new CargoComponent("name", "version");
-        var scannedComponent = new ScannedComponent() { Component = cargoComponent }; 
+        var scannedComponent = new ScannedComponentWithLicense() { Component = cargoComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -132,7 +132,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void CondaComponent_ToSbomPackage()
     {
         var condaComponent = new CondaComponent("name", "version", "build", "channel", "subdir", "namespace", "http://microsoft.com", "md5");
-        var scannedComponent = new ScannedComponent() { Component = condaComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = condaComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -148,7 +148,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void DockerImageComponent_ToSbomPackage()
     {
         var dockerImageComponent = new DockerImageComponent("name", "version", "tag") { Digest = "digest" };
-        var scannedComponent = new ScannedComponent() { Component = dockerImageComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = dockerImageComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -163,7 +163,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void NpmComponent_ToSbomPackage()
     {
         var npmComponent = new NpmComponent("name", "verison", author: new NpmAuthor("name", "email@contoso.com"));
-        var scannedComponent = new ScannedComponent() { Component = npmComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = npmComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -178,7 +178,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void NpmComponent_ToSbomPackage_NoAuthor()
     {
         var npmComponent = new NpmComponent("name", "verison");
-        var scannedComponent = new ScannedComponent() { Component = npmComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = npmComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -193,7 +193,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void NuGetComponent_ToSbomPackage()
     {
         var nuGetComponent = new NuGetComponent("name", "version", new string[] { "Author Name1, Another Author" });
-        var scannedComponent = new ScannedComponent() { Component = nuGetComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = nuGetComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -208,7 +208,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void NuGetComponent_ToSbomPackage_NoAuthor()
     {
         var nuGetComponent = new NuGetComponent("name", "version");
-        var scannedComponent = new ScannedComponent() { Component = nuGetComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = nuGetComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -223,7 +223,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     public void PipComponent_ToSbomPackage()
     {
         var pipComponent = new PipComponent("name", "version");
-        var scannedComponent = new ScannedComponent() { Component = pipComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = pipComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -238,7 +238,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
     {
         var uri = new Uri("https://microsoft.com");
         var gitComponent = new GitComponent(uri, "version");
-        var scannedComponent = new ScannedComponent() { Component = gitComponent };
+        var scannedComponent = new ScannedComponentWithLicense() { Component = gitComponent };
 
         var sbomPackage = scannedComponent.ToSbomPackage(new AdapterReport());
 
@@ -254,7 +254,7 @@ public class ComponentDetectionToSBOMPackageAdapterTests
         Directory.CreateDirectory(baseDirectory);
         File.WriteAllText(bcdeOutputPath, json);
 
-        ComponentDetectionToSBOMPackageAdapter adapter = new ComponentDetectionToSBOMPackageAdapter();
+        var adapter = new ComponentDetectionToSBOMPackageAdapter();
         var (errors, packages) = adapter.TryConvert(bcdeOutputPath);
         var output = packages.ToList();
 

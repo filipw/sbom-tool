@@ -24,12 +24,10 @@ public class ManifestInfo : IEquatable<ManifestInfo>
 
     /// <summary>
     /// Parses the manifest info from a string
-    /// The format is <name>:<version>
+    /// The format is <code>&lt;name&gt;:&lt;version&gt;</code>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1629:Documentation text should end with a period", 
-        Justification = "Code element in comment.")]
     public static ManifestInfo Parse(string value)
     {
         if (string.IsNullOrEmpty(value))
@@ -50,9 +48,9 @@ public class ManifestInfo : IEquatable<ManifestInfo>
         };
     }
 
-    public override bool Equals(object other)
+    public override bool Equals(object obj)
     {
-        return Equals(other as ManifestInfo);
+        return Equals(obj as ManifestInfo);
     }
 
     public static bool operator ==(ManifestInfo obj1, ManifestInfo obj2)
@@ -74,7 +72,7 @@ public class ManifestInfo : IEquatable<ManifestInfo>
 
     public override int GetHashCode()
     {
-        int hashCode = 2112831277;
+        var hashCode = 2112831277;
         hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Name.ToLowerInvariant());
         hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(Version.ToLowerInvariant());
         return hashCode;

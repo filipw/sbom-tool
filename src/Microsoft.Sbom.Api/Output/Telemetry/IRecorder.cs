@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -35,6 +35,12 @@ public interface IRecorder
     public void RecordTotalNumberOfPackages(int count);
 
     /// <summary>
+    /// Adds onto the total count of licenses that were retrieved from the API.
+    /// </summary>
+    /// <param name="count">Count of licenses to be added.</param>
+    public void AddToTotalCountOfLicenses(int count);
+
+    /// <summary>
     /// Records a SBOM format that we used during the execution of the SBOM tool.
     /// </summary>
     /// <param name="manifestInfo">The SBOM format as a <see cref="ManifestInfo"/> object.</param>
@@ -52,11 +58,18 @@ public interface IRecorder
     public void RecordSwitch(string switchName, object value);
 
     /// <summary>
-    /// Record any exception that was encountered during the exection of the tool.
+    /// Record any exception that was encountered during the execution of the tool.
     /// </summary>
     /// <param name="exception">The exception that was encountered.</param>
     /// <exception cref="ArgumentNullException">If the exception is null.</exception>
     public void RecordException(Exception exception);
+
+    /// <summary>
+    /// Record any exception that was encountered during the execution of API calls.
+    /// </summary>
+    /// <param name="exception">The exception that was encountered.</param>
+    /// <exception cref="ArgumentNullException">If the exception is null.</exception>
+    public void RecordAPIException(Exception exception);
 
     /// <summary>
     /// Finalize the recorder, and log the telemetry.

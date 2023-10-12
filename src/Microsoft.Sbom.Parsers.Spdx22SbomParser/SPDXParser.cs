@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using Microsoft.Sbom.Contracts;
 using Microsoft.Sbom.Contracts.Enums;
@@ -90,19 +91,32 @@ public class SPDXParser : ISbomParser
         this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
 
         // Validate buffer is not of 0 length.
-        if (buffer is null || buffer.Length == 0)
+        if (buffer.Length == 0)
         {
             throw new ArgumentException($"The {nameof(buffer)} value can't be null or of 0 length.");
         }
+
+        // Utf8JsonReader will not handle BOM's, so we need to "eat" them before.
+        this.stream.Position = GetStartPosition(this.stream);
 
         // Fill up the buffer.
         if (!stream.CanRead || stream.Read(buffer) == 0)
         {
             throw new EndOfStreamException();
         }
+
+        static int GetStartPosition(Stream stream)
+        {
+            var bom = Encoding.UTF8.Preamble.ToArray();
+            stream.Position = 0;
+            var buffer = new byte[bom.Length];
+            stream.Read(buffer, 0, buffer.Length);
+
+            return Enumerable.SequenceEqual(buffer, bom) ? 3 : 0;
+        }
     }
 
-    private readonly ManifestInfo spdxManifestInfo = new ()
+    private readonly ManifestInfo spdxManifestInfo = new()
     {
         Name = Constants.SPDXName,
         Version = Constants.SPDXVersion
@@ -193,8 +207,8 @@ public class SPDXParser : ISbomParser
             var reader = new Utf8JsonReader(buffer, isFinalBlock: isFinalBlock, readerState);
 
             // The root properties parser consumes the value of the property as well. For example,
-            // "spdxId": "SPDXID", root parser would have already consumed the SPDXID string. To 
-            // work around this issue, the root parser will return the next token which we store in 
+            // "spdxId": "SPDXID", root parser would have already consumed the SPDXID string. To
+            // work around this issue, the root parser will return the next token which we store in
             // nextTokenString and use it here instead of doing a reader.ReadString().
             switch (currentRootPropertyName)
             {
@@ -316,7 +330,7 @@ public class SPDXParser : ISbomParser
             throw new ParserException($"The parser is not currently enumerating references. Current state: {CurrentState}");
         }
 
-        while (GetExternalDocumentReferences(stream, out SpdxExternalDocumentReference spdxExternalDocumentReference) != 0)
+        while (GetExternalDocumentReferences(stream, out var spdxExternalDocumentReference) != 0)
         {
             yield return spdxExternalDocumentReference.ToSbomReference();
         }
@@ -379,7 +393,7 @@ public class SPDXParser : ISbomParser
             throw new ParserException($"The parser is not currently enumerating relationships. Current state: {CurrentState}");
         }
 
-        while (GetRelationships(stream, out SPDXRelationship sbomRelationship) != 0)
+        while (GetRelationships(stream, out var sbomRelationship) != 0)
         {
             yield return sbomRelationship.ToSbomRelationship();
         }
@@ -442,7 +456,7 @@ public class SPDXParser : ISbomParser
             throw new ParserException($"The parser is not currently enumerating packages. Current state: {CurrentState}");
         }
 
-        while (GetPackages(stream, out SPDXPackage sbomPackage) != 0)
+        while (GetPackages(stream, out var sbomPackage) != 0)
         {
             yield return sbomPackage.ToSbomPackage();
         }
@@ -505,7 +519,7 @@ public class SPDXParser : ISbomParser
             throw new ParserException($"The parser is not currently enumerating files. Current state: {CurrentState}");
         }
 
-        while (GetFiles(stream, out SPDXFile sbomFile) != 0)
+        while (GetFiles(stream, out var sbomFile) != 0)
         {
             yield return sbomFile.ToSbomFile();
         }

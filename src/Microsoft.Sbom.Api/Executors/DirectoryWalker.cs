@@ -14,7 +14,7 @@ using Serilog;
 namespace Microsoft.Sbom.Api.Executors;
 
 /// <summary>
-/// Given a directory path, walks the subtree and returns all the 
+/// Given a directory path, walks the subtree and returns all the
 /// files in the directory.
 /// </summary>
 public class DirectoryWalker
@@ -57,8 +57,10 @@ public class DirectoryWalker
         {
             try
             {
+                log.Verbose("Enumerating files under the directory {path}", path);
                 foreach (var file in fileSystemUtils.GetFilesInDirectory(path, followSymlinks))
                 {
+                    log.Verbose("Found file {file}.", file);
                     await output.Writer.WriteAsync(file);
                 }
 

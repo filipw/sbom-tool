@@ -14,7 +14,7 @@ using Serilog;
 namespace Microsoft.Sbom.Api.Executors;
 
 /// <summary>
-/// Uses the <see cref="IManifestGenerator"/> to write a json object that contains 
+/// Uses the <see cref="IManifestGenerator"/> to write a json object that contains
 /// a format specific representation of the <see cref="ExternalDocumentReferenceInfo"/>.
 /// </summary>
 public class ExternalDocumentReferenceWriter
@@ -47,7 +47,7 @@ public class ExternalDocumentReferenceWriter
 
         Task.Run(async () =>
         {
-            await foreach (ExternalDocumentReferenceInfo externalDocumentReferenceInfo in externalDocumentReferenceInfos.ReadAllAsync())
+            await foreach (var externalDocumentReferenceInfo in externalDocumentReferenceInfos.ReadAllAsync())
             {
                 foreach (var config in externalDocumentReferenceArraySupportingConfigs)
                 {

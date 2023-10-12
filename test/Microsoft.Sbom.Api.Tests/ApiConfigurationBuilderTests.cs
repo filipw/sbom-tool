@@ -49,7 +49,7 @@ public class ApiConfigurationBuilderTests
     [TestMethod]
     public void GetConfiguration_PopulateAll()
     {
-        List<SbomSpecification> specs = new List<SbomSpecification>();
+        var specs = new List<SbomSpecification>();
         specs.Add(new SbomSpecification("spdx", "2.2"));
 
         var expectedManifestInfo = new ManifestInfo()
@@ -124,8 +124,13 @@ public class ApiConfigurationBuilderTests
         };
 
         var config = ApiConfigurationBuilder.GetConfiguration(
-            RootPath, string.Empty, null, null,
-            metadata, null, runtime);
+            RootPath,
+            string.Empty,
+            null,
+            null,
+            this.metadata,
+            null,
+            runtime);
 
         Assert.AreEqual(output, config.Verbosity.Value);
     }

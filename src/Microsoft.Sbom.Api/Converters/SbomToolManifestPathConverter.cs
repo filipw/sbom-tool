@@ -10,14 +10,14 @@ using Constants = Microsoft.Sbom.Api.Utils.Constants;
 namespace Microsoft.Sbom.Api.Convertors;
 
 /// <summary>
-/// Converts a regular file path to a relative file path in the format the 
+/// Converts a regular file path to a relative file path in the format the
 /// SbomTool expects. The expected format looks like this:
-/// 
+///
 /// Root                  : C:\dropRoot
 /// Absolute path         : C:\dropRoot\folder1\file1.txt
 /// Relative path         : folder1\file1.txt
 /// SbomTool Format  : /folder1/file1.txt
-/// 
+///
 /// Throws a <see cref="InvalidPathException"/> if the file is outside the root folder.
 /// </summary>
 public class SbomToolManifestPathConverter : IManifestPathConverter
@@ -37,11 +37,11 @@ public class SbomToolManifestPathConverter : IManifestPathConverter
 
     public (string, bool) Convert(string path, bool prependDotToPath = false)
     {
-        string dotString = prependDotToPath ? "." : string.Empty;
-            
-        // relativeTo 
-        string buildDropPath = configuration.BuildDropPath.Value;
-        bool isOutsideDropPath = false;
+        var dotString = prependDotToPath ? "." : string.Empty;
+
+        // relativeTo
+        var buildDropPath = configuration.BuildDropPath.Value;
+        var isOutsideDropPath = false;
         if (path == null)
         {
             throw new ArgumentNullException(nameof(path));
@@ -59,8 +59,8 @@ public class SbomToolManifestPathConverter : IManifestPathConverter
             }
         }
 
-        string relativePath = fileSystemUtils.GetRelativePath(buildDropPath, path);
-        string formattedRelativePath = $"{dotString}/{relativePath.Replace("\\", "/")}";
+        var relativePath = fileSystemUtils.GetRelativePath(buildDropPath, path);
+        var formattedRelativePath = $"{dotString}/{relativePath.Replace("\\", "/")}";
 
         return (formattedRelativePath, isOutsideDropPath);
     }

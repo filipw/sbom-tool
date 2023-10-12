@@ -26,7 +26,7 @@ internal ref struct SbomFileParser
     private const string CopyrightTextProperty = "copyrightText";
 
     private readonly Stream stream;
-    private readonly SPDXFile sbomFile = new ();
+    private readonly SPDXFile sbomFile = new();
 
     public SbomFileParser(Stream stream)
     {
@@ -35,7 +35,7 @@ internal ref struct SbomFileParser
 
     /// <summary>
     /// Parses the SPDX SBOM 'files' array section and generates a <see cref="SBOMFile"/> object for it.
-    /// 
+    ///
     /// If an object is parsed successfully, the <see cref="sbomFile"/> parameter will have the newly created
     /// object.
     /// </summary>
@@ -73,7 +73,7 @@ internal ref struct SbomFileParser
             while (reader.TokenType != JsonTokenType.EndObject)
             {
                 ParseProperty(ref reader, ref buffer);
-                
+
                 // Read the end } of this object or the next property name.
                 ParserUtils.Read(stream, ref buffer, ref reader);
             }
@@ -96,8 +96,8 @@ internal ref struct SbomFileParser
         // I want to use the DataAnnotations Validator here, but will check with CB first
         // before adding a new dependency.
         var missingProps = new List<string>();
-       
-        if (sbomFile.FileChecksums == null || sbomFile.FileChecksums.Where(c => c.Algorithm == AlgorithmName.SHA256.Name).Count() == 0)
+
+        if (sbomFile.FileChecksums == null || sbomFile.FileChecksums.All(c => c.Algorithm != AlgorithmName.SHA256.Name))
         {
             missingProps.Add(nameof(sbomFile.FileChecksums));
         }
@@ -122,12 +122,12 @@ internal ref struct SbomFileParser
             missingProps.Add(nameof(sbomFile.LicenseConcluded));
         }
 
-        if (sbomFile.LicenseInfoInFiles == null || sbomFile.LicenseInfoInFiles.Count == 0)
+        if (sbomFile.LicenseInfoInFiles == null || !sbomFile.LicenseInfoInFiles.Any())
         {
             missingProps.Add(nameof(sbomFile.LicenseInfoInFiles));
         }
 
-        if (missingProps.Count() > 0)
+        if (missingProps.Count > 0)
         {
             throw new ParserException($"Missing required value(s) for file object at position {stream.Position}: {string.Join(",", missingProps)}");
         }

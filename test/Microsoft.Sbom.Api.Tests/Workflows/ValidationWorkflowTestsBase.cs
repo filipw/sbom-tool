@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Microsoft. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +51,7 @@ public class ValidationWorkflowTestsBase
         ["/child2/grandchild2/file10"] = new Checksum[] { new Checksum { Algorithm = AlgorithmName.SHA256, ChecksumValue = "missingfile" } }
     };
 
-    protected ManifestData GetDefaultManifestData() => new ()
+    protected ManifestData GetDefaultManifestData() => new()
     {
         HashesMap = new ConcurrentDictionary<string, Checksum[]>(GetFilesDictionary(), StringComparer.InvariantCultureIgnoreCase)
     };

@@ -60,7 +60,7 @@ public class SPDXPackage
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("licenseInfoFromFiles")]
-    public List<string> LicenseInfoFromFiles { get; set; }
+    public IEnumerable<string> LicenseInfoFromFiles { get; set; }
 
     /// <summary>
     /// Gets or sets contains a list of licenses the have been declared by the authors of the package.
@@ -83,7 +83,7 @@ public class SPDXPackage
     public string VersionInfo { get; set; }
 
     /// <summary>
-    /// Gets or sets provide an independently reproducible mechanism that permits unique identification of a specific 
+    /// Gets or sets provide an independently reproducible mechanism that permits unique identification of a specific
     /// package that correlates to the data in this SPDX file.
     /// </summary>
     [JsonPropertyName("checksums")]
@@ -91,13 +91,13 @@ public class SPDXPackage
     public List<Checksum> Checksums { get; set; }
 
     /// <summary>
-    /// Gets or sets provide a list of <see cref="ExternalReference"/> that provide additional information or metadata 
+    /// Gets or sets provide a list of <see cref="ExternalReference"/> that provide additional information or metadata
     /// about this package.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("externalRefs")]
     public IList<ExternalReference> ExternalReferences { get; set; }
-        
+
     /// <summary>
     /// Gets or sets the name and optional contact information of the person or organization that built this package.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -80,7 +80,7 @@ public class Generator : IManifestGenerator
             FileCopyrightText = fileInfo.FileCopyrightText ?? Constants.NoAssertionValue,
             LicenseConcluded = fileInfo.LicenseConcluded ?? Constants.NoAssertionValue,
             LicenseInfoInFiles = fileInfo.LicenseInfoInFiles ?? Constants.NoAssertionListValue,
-            FileTypes = fileInfo.FileTypes?.Select(f => GetSPDXFileType(f)).ToList(),
+            FileTypes = fileInfo.FileTypes?.Select(this.GetSPDXFileType).ToList(),
         };
 
         spdxFileElement.AddSpdxId(fileInfo.Path, fileInfo.Checksum);
@@ -89,7 +89,7 @@ public class Generator : IManifestGenerator
 
     // Throws a <see cref="MissingHashValueException"/> if the filehashes are missing
     // any of the required hashes
-    private void EnsureRequiredHashesPresent(Sbom.Contracts.Checksum[] fileHashes)
+    private void EnsureRequiredHashesPresent(Contracts.Checksum[] fileHashes)
     {
         foreach (var hashAlgorithmName in from hashAlgorithmName in RequiredHashAlgorithms
                  where !fileHashes.Select(fh => fh.Algorithm).Contains(hashAlgorithmName)
@@ -179,7 +179,7 @@ public class Generator : IManifestGenerator
 
     private string EnsureRelativePathStartsWithDot(string path)
     {
-        if (!path.StartsWith("."))
+        if (!path.StartsWith(".", StringComparison.Ordinal))
         {
             return "." + path;
         }
@@ -297,12 +297,9 @@ public class Generator : IManifestGenerator
             throw new ArgumentNullException(nameof(externalDocumentReferenceInfo.Checksum));
         }
 
-        var sha1Hash = externalDocumentReferenceInfo.Checksum.Where(h => h.Algorithm == AlgorithmName.SHA1).FirstOrDefault();
-
-        if (sha1Hash is null)
-        {
-            throw new MissingHashValueException($"The hash value for algorithm {AlgorithmName.SHA1} is missing from {nameof(externalDocumentReferenceInfo)}");
-        }
+        var sha1Hash = externalDocumentReferenceInfo.Checksum.FirstOrDefault(h => h.Algorithm == AlgorithmName.SHA1) ??
+                       throw new MissingHashValueException(
+                           $"The hash value for algorithm {AlgorithmName.SHA1} is missing from {nameof(externalDocumentReferenceInfo)}");
 
         var checksumValue = sha1Hash.ChecksumValue.ToLower();
         var externalDocumentReferenceElement = new SpdxExternalDocumentReference

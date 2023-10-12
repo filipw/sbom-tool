@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -75,7 +75,7 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
     {
         IList<FileValidationResult> validErrors = new List<FileValidationResult>();
         string sbomDir = null;
-        bool deleteSBOMDir = false;
+        var deleteSBOMDir = false;
         using (recorder.TraceEvent(Events.SBOMGenerationWorkflow))
         {
             try
@@ -88,6 +88,10 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
                 if (configuration.ManifestDirPath.IsDefaultSource)
                 {
                     RemoveExistingManifestDirectory();
+                }
+                else
+                {
+                    log.Warning("Manifest directory path was explicitly defined. Will not attempt to delete any existing _manifest directory.");
                 }
 
                 await using (sbomConfigs.StartJsonSerializationAsync())
@@ -149,7 +153,7 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
 
                 try
                 {
-                    // Delete the generated temp folder if necessary 
+                    // Delete the generated temp folder if necessary
                     if (fileSystemUtils.DirectoryExists(fileSystemUtils.GetSbomToolTempPath()))
                     {
                         fileSystemUtils.DeleteDir(fileSystemUtils.GetSbomToolTempPath(), true);
@@ -158,11 +162,11 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
                 catch (Exception e)
                 {
                     log.Warning($"Unable to delete the temp directory {fileSystemUtils.GetSbomToolTempPath()}", e);
-                }          
+                }
             }
         }
     }
-        
+
     private void DeleteManifestFolder(string sbomDir)
     {
         try
@@ -182,9 +186,10 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
         }
         catch (Exception e)
         {
-            log.Warning(
+            this.log.Warning(
                 $"Manifest generation failed, however we were " +
-                $"unable to delete the partially generated manifest.json file and the {sbomDir} directory.", e);
+                $"unable to delete the partially generated manifest.json file and the {sbomDir} directory.",
+                e);
         }
     }
 
@@ -196,7 +201,7 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
             return;
         }
 
-        string hashFileName = $"{manifestJsonFilePath}.sha256";
+        var hashFileName = $"{manifestJsonFilePath}.sha256";
 
         using var readStream = fileSystemUtils.OpenRead(manifestJsonFilePath);
         using var bufferedStream = new BufferedStream(readStream, 1024 * 32);
@@ -211,7 +216,7 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
 
         try
         {
-            // If the _manifest directory already exists, we must delete it first to avoid having 
+            // If the _manifest directory already exists, we must delete it first to avoid having
             // multiple SBOMs for the same drop. However, the default behaviour is to fail with an
             // Exception since we don't want to inadvertently delete someone else's data. This behaviour
             // can be overridden by setting an environment variable.
@@ -219,7 +224,7 @@ public class SbomGenerationWorkflow : IWorkflow<SbomGenerationWorkflow>
             {
                 bool.TryParse(
                     osUtils.GetEnvironmentVariable(Constants.DeleteManifestDirBoolVariableName),
-                    out bool deleteSbomDirSwitch);
+                    out var deleteSbomDirSwitch);
 
                 recorder.RecordSwitch(Constants.DeleteManifestDirBoolVariableName, deleteSbomDirSwitch);
 

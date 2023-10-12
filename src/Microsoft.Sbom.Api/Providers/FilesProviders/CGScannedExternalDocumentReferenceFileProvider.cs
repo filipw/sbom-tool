@@ -33,7 +33,8 @@ public class CGScannedExternalDocumentReferenceFileProvider : PathBasedFileToJso
     public CGScannedExternalDocumentReferenceFileProvider(
         IConfiguration configuration,
         ChannelUtils channelUtils,
-        ILogger log, FileHasher fileHasher,
+        ILogger log,
+        FileHasher fileHasher,
         ManifestFolderFilterer fileFilterer,
         FileInfoWriter fileHashWriter,
         InternalSBOMFileInfoDeduplicator internalSBOMFileInfoDeduplicator,
@@ -65,7 +66,7 @@ public class CGScannedExternalDocumentReferenceFileProvider : PathBasedFileToJso
         var (sbomOutput, cdErrors) = SBOMComponentsWalker.GetComponents(Configuration.BuildComponentPath?.Value);
         IList<ChannelReader<FileValidationResult>> errors = new List<ChannelReader<FileValidationResult>>();
 
-        if (cdErrors.TryRead(out ComponentDetectorException e))
+        if (cdErrors.TryRead(out var e))
         {
             throw e;
         }

@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Sbom.Api.Entities;
 using Microsoft.Sbom.Api.Manifest;
-using Microsoft.Sbom.Common;
-using Microsoft.Sbom.Common.Config;
 using Microsoft.Sbom.Extensions;
 using Microsoft.Sbom.Extensions.Entities;
 using Serilog;
@@ -16,21 +15,15 @@ using Serilog;
 namespace Microsoft.Sbom.Api.Executors;
 
 /// <summary>
-/// Uses the <see cref="IManifestGenerator"/> to write a json object that contains 
+/// Uses the <see cref="IManifestGenerator"/> to write a json object that contains
 /// a file path and its associated hashes.
 /// </summary>
 public class FileInfoWriter
 {
     private readonly ManifestGeneratorProvider manifestGeneratorProvider;
     private readonly ILogger log;
-    private readonly IFileSystemUtilsExtension fileSystemUtilsExtension;
-    private readonly IConfiguration configuration;
 
-    public FileInfoWriter(
-        ManifestGeneratorProvider manifestGeneratorProvider,
-        ILogger log,
-        IFileSystemUtilsExtension fileSystemUtilsExtension,
-        IConfiguration configuration)
+    public FileInfoWriter(ManifestGeneratorProvider manifestGeneratorProvider, ILogger log)
     {
         if (manifestGeneratorProvider is null)
         {
@@ -39,8 +32,6 @@ public class FileInfoWriter
 
         this.manifestGeneratorProvider = manifestGeneratorProvider;
         this.log = log ?? throw new ArgumentNullException(nameof(log));
-        this.fileSystemUtilsExtension = fileSystemUtilsExtension ?? throw new ArgumentNullException(nameof(fileSystemUtilsExtension));
-        this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
     }
 
     public (ChannelReader<JsonDocWithSerializer> result, ChannelReader<FileValidationResult> errors) Write(ChannelReader<InternalSbomFileInfo> fileInfos, IList<ISbomConfig> filesArraySupportingSBOMs)
@@ -50,7 +41,7 @@ public class FileInfoWriter
 
         Task.Run(async () =>
         {
-            await foreach (InternalSbomFileInfo fileInfo in fileInfos.ReadAllAsync())
+            await foreach (var fileInfo in fileInfos.ReadAllAsync())
             {
                 await Generate(filesArraySupportingSBOMs, fileInfo, result, errors);
             }
@@ -68,6 +59,7 @@ public class FileInfoWriter
         {
             foreach (var config in filesArraySupportingSBOMs)
             {
+                log.Verbose("Generating json for file {file} into {config}", sbomFile.Path, config.ManifestJsonFilePath);
                 var generationResult = manifestGeneratorProvider
                     .Get(config.ManifestInfo)
                     .GenerateJsonDocument(sbomFile);

@@ -61,7 +61,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
     {
         ValidationResult validationResultOutput = null;
         IEnumerable<FileValidationResult> validFailures = null;
-        int totalNumberOfPackages = 0;
+        var totalNumberOfPackages = 0;
 
         using (recorder.TraceEvent(Events.SBOMValidationWorkflow))
         {
@@ -70,7 +70,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
                 var sw = Stopwatch.StartNew();
                 var sbomConfig = sbomConfigs.Get(configuration.ManifestInfo.Value.FirstOrDefault());
 
-                using Stream stream = fileSystemUtils.OpenRead(sbomConfig.ManifestJsonFilePath);
+                using var stream = fileSystemUtils.OpenRead(sbomConfig.ManifestJsonFilePath);
                 var manifestInterface = manifestParserProvider.Get(sbomConfig.ManifestInfo);
                 var sbomParser = manifestInterface.CreateParser(stream);
 
@@ -93,7 +93,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
                     }
                 }
 
-                int successfullyValidatedFiles = 0;
+                var successfullyValidatedFiles = 0;
                 List<FileValidationResult> fileValidationFailures = null;
 
                 while (sbomParser.Next() != Contracts.Enums.ParserState.FINISHED)
@@ -155,7 +155,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
                 };
 
                 await outputWriter.WriteAsync(JsonSerializer.Serialize(validationResultOutput, options));
-                    
+
                 validFailures = fileValidationFailures.Where(f => !Constants.SkipFailureReportingForErrors.Contains(f.ErrorType));
 
                 if (configuration.IgnoreMissing.Value)
@@ -221,7 +221,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
         validFailures.Where(vf => vf.ErrorType == ErrorType.Other).ForEach(f => Console.WriteLine(f.Path));
         Console.WriteLine("------------------------------------------------------------");
 
-        if (validFailures.Where(vf => vf.ErrorType == ErrorType.NoPackagesFound).Count() > 0)
+        if (validFailures.Any(vf => vf.ErrorType == ErrorType.NoPackagesFound))
         {
             Console.WriteLine("Package validation results:");
             Console.WriteLine(string.Empty);
@@ -255,7 +255,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
         Console.WriteLine($"Files with invalid hashes . . . . . . . . . . . .{validFailures.Count(v => v.ErrorType == ErrorType.InvalidHash)}");
         Console.WriteLine($"Files in the manifest missing from the disk . . .{validFailures.Count(v => v.ErrorType == ErrorType.MissingFile)}");
 
-        if (validFailures.Where(vf => vf.ErrorType == ErrorType.NoPackagesFound).Count() > 0)
+        if (validFailures.Any(vf => vf.ErrorType == ErrorType.NoPackagesFound))
         {
             Console.WriteLine($"Package validation failures . . . . . . . . . . .{validFailures.Count(v => v.ErrorType == ErrorType.NoPackagesFound)}");
         }
