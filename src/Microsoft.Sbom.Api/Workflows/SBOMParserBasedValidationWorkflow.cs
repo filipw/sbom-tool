@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -18,12 +19,14 @@ using Microsoft.Sbom.Api.Utils;
 using Microsoft.Sbom.Api.Workflows.Helpers;
 using Microsoft.Sbom.Common;
 using Microsoft.Sbom.Common.Config;
+using Microsoft.Sbom.Contracts;
 using Microsoft.Sbom.Extensions;
 using Microsoft.Sbom.JsonAsynchronousNodeKit;
 using Microsoft.Sbom.Parser;
 using PowerArgs;
 using Serilog;
 using Constants = Microsoft.Sbom.Api.Utils.Constants;
+using EntityErrorType = Microsoft.Sbom.Contracts.Enums.ErrorType;
 
 namespace Microsoft.Sbom.Api.Workflows;
 
@@ -62,6 +65,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
     {
         ValidationResult validationResultOutput = null;
         IEnumerable<FileValidationResult> validFailures = null;
+        List<EntityError> otherErrors = new();
         var totalNumberOfPackages = 0;
 
         using (recorder.TraceEvent(Events.SBOMValidationWorkflow))
@@ -70,69 +74,18 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
             {
                 var sw = Stopwatch.StartNew();
                 var sbomConfig = sbomConfigs.Get(configuration.ManifestInfo.Value.FirstOrDefault());
-                using var stream = fileSystemUtils.OpenRead(sbomConfig.ManifestJsonFilePath);
-                var manifestInterface = manifestParserProvider.Get(sbomConfig.ManifestInfo);
-                var sbomParser = manifestInterface.CreateParser(stream);
 
-                // Validate signature
-                if (configuration.ValidateSignature != null && configuration.ValidateSignature.Value)
+                if (!this.ValidateSignature())
                 {
-                    var signValidator = signValidationProvider.Get();
-
-                    if (signValidator == null)
+                    otherErrors.Add(new EntityError()
                     {
-                        log.Warning($"ValidateSignature switch is true, but couldn't find a sign validator for the current OS, skipping validation.");
-                    }
-                    else
-                    {
-                        if (!signValidator.Validate())
-                        {
-                            log.Error("Sign validation failed.");
-                            return false;
-                        }
-                    }
-                }
-
-                var successfullyValidatedFiles = 0;
-                List<FileValidationResult> fileValidationFailures = null;
-
-                ParserStateResult? result = null;
-                do
-                {
-                    result = sbomParser.Next();
-                    if (result is not null)
-                    {
-                        switch (result)
-                        {
-                            case FilesResult filesResult:
-                                (successfullyValidatedFiles, fileValidationFailures) = await filesValidator.Validate(filesResult.Files);
-                                break;
-                            case PackagesResult packagesResult:
-                                var packages = packagesResult.Packages.ToList();
-                                totalNumberOfPackages = packages.Count();
-                                break;
-                            case RelationshipsResult relationshipsResult:
-                                relationshipsResult.Relationships.ToList();
-                                break;
-                            case ExternalDocumentReferencesResult externalRefResult:
-                                externalRefResult.References.ToList();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                while (result is not null);
-
-                _ = sbomParser.GetMetadata();
-
-                if (configuration.FailIfNoPackages?.Value == true && totalNumberOfPackages <= 1)
-                {
-                    fileValidationFailures.Add(new FileValidationResult
-                    {
-                        ErrorType = ErrorType.NoPackagesFound
+                        ErrorType = EntityErrorType.SignatureValidationError
                     });
+                    throw new Exception("Sign validation failed");
                 }
+
+                var sbomParserData = await this.ValidateParsedSbom(sbomConfig);
+                totalNumberOfPackages = sbomParserData.TotalNumberOfPackages;
 
                 log.Debug("Finished workflow, gathering results.");
 
@@ -140,9 +93,10 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
                 validationResultOutput = validationResultGenerator
                     .WithTotalFilesInManifest(sbomConfig.Recorder.GetGenerationData().Checksums.Count())
                     .WithTotalPackagesInManifest(totalNumberOfPackages)
-                    .WithSuccessCount(successfullyValidatedFiles)
+                    .WithSuccessCount(sbomParserData.SuccessfullyValidatedFiles)
                     .WithTotalDuration(sw.Elapsed)
-                    .WithValidationResults(fileValidationFailures)
+                    .WithValidationResults(sbomParserData.FileValidationFailures)
+                    .WithAdditionalErrors(otherErrors)
                     .Build();
 
                 // Write JSON output to file.
@@ -156,7 +110,7 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
 
                 await outputWriter.WriteAsync(JsonSerializer.Serialize(validationResultOutput, options));
 
-                validFailures = fileValidationFailures.Where(f => !Constants.SkipFailureReportingForErrors.Contains(f.ErrorType));
+                validFailures = sbomParserData.FileValidationFailures.Where(f => !Constants.SkipFailureReportingForErrors.Contains(f.ErrorType));
 
                 if (configuration.IgnoreMissing.Value)
                 {
@@ -175,9 +129,11 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
             }
             finally
             {
-                if (validFailures != null && validFailures.Any())
+                var totalErrors = validFailures == null ? new List<EntityError>() : validFailures.Select(fileError => fileError.ToEntityError()).ToList();
+                totalErrors.AddRange(otherErrors);
+                if (totalErrors.Any())
                 {
-                    recorder.RecordTotalErrors(validFailures.ToList());
+                    recorder.RecordTotalErrors(totalErrors);
                 }
 
                 // Log telemetry
@@ -186,6 +142,84 @@ public class SbomParserBasedValidationWorkflow : IWorkflow<SbomParserBasedValida
                 LogIndividualFileResults(validFailures);
             }
         }
+    }
+
+    private bool ValidateSignature()
+    {
+        if (configuration.ValidateSignature != null && configuration.ValidateSignature.Value)
+        {
+            var signValidator = signValidationProvider.Get();
+
+            if (signValidator == null)
+            {
+                log.Warning($"ValidateSignature switch is true, but couldn't find a sign validator for the current OS, skipping validation.");
+            }
+            else
+            {
+                if (!signValidator.Validate())
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    internal class SbomParserValidationData
+    {
+        public int TotalNumberOfPackages = 0;
+        public int SuccessfullyValidatedFiles = 0;
+        public List<FileValidationResult> FileValidationFailures = new();
+    }
+
+    private async Task<SbomParserValidationData> ValidateParsedSbom(ISbomConfig sbomConfig)
+    {
+        using var stream = fileSystemUtils.OpenRead(sbomConfig.ManifestJsonFilePath);
+        var manifestInterface = manifestParserProvider.Get(sbomConfig.ManifestInfo);
+        var sbomParser = manifestInterface.CreateParser(stream);
+
+        var data = new SbomParserValidationData();
+
+        ParserStateResult? result = null;
+        do
+        {
+            result = sbomParser.Next();
+            if (result is not null)
+            {
+                switch (result)
+                {
+                    case FilesResult filesResult:
+                        (data.SuccessfullyValidatedFiles, data.FileValidationFailures) = await this.filesValidator.Validate(filesResult.Files);
+                        break;
+                    case PackagesResult packagesResult:
+                        var packages = packagesResult.Packages.ToList();
+                        data.TotalNumberOfPackages = packages.Count();
+                        break;
+                    case RelationshipsResult relationshipsResult:
+                        relationshipsResult.Relationships.ToList();
+                        break;
+                    case ExternalDocumentReferencesResult externalRefResult:
+                        externalRefResult.References.ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        while (result is not null);
+
+        _ = sbomParser.GetMetadata();
+
+        if (configuration.FailIfNoPackages?.Value == true && data.TotalNumberOfPackages <= 1)
+        {
+            data.FileValidationFailures.Add(new FileValidationResult
+            {
+                ErrorType = ErrorType.NoPackagesFound
+            });
+        }
+
+        return data;
     }
 
     private void LogIndividualFileResults(IEnumerable<FileValidationResult> validFailures)

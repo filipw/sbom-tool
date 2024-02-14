@@ -51,4 +51,10 @@ public enum ErrorType
     /// </summary>
     [EnumMember(Value = "Other")]
     Other = 6,
+
+    /// <summary>
+    /// Error while validating signature.
+    /// </summary>
+    [EnumMember(Value = "Signature validation error")]
+    SignatureValidationError = 7,
 }

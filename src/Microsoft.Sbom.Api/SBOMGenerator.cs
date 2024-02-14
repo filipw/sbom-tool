@@ -78,7 +78,7 @@ public class SbomGenerator : ISBOMGenerator
 
         await recorder.FinalizeAndLogTelemetryAsync();
 
-        var entityErrors = recorder.Errors.Select(error => error.ToEntityError()).ToList();
+        var entityErrors = recorder.Errors;
 
         return new SbomGenerationResult(isSuccess, entityErrors);
     }

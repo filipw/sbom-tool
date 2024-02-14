@@ -59,7 +59,7 @@ public class SbomValidator : ISBOMValidator
         var isSuccess = await sbomParserBasedValidationWorkflow.RunAsync();
         await recorder.FinalizeAndLogTelemetryAsync();
 
-        var entityErrors = recorder.Errors.Select(error => error.ToEntityError()).ToList();
+        var entityErrors = recorder.Errors;
 
         return isSuccess;
     }
@@ -106,7 +106,7 @@ public class SbomValidator : ISBOMValidator
         var isSuccess = await sbomParserBasedValidationWorkflow.RunAsync();
         await recorder.FinalizeAndLogTelemetryAsync();
 
-        var errors = recorder.Errors.Select(error => error.ToEntityError()).ToList();
+        var errors = recorder.Errors;
         return new SBOMValidationResult(!errors.Any(), errors);
     }
 

@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.Sbom.Contracts;
+
 namespace Microsoft.Sbom.Api.Entities.Output;
 
 /// <summary>
@@ -16,7 +18,7 @@ public class ValidationResult
     /// <summary>
     /// Gets or sets a list of <see cref="FileValidationResult"/>s.
     /// </summary>
-    public ErrorContainer<FileValidationResult> ValidationErrors { get; set; }
+    public ErrorContainer<EntityError> ValidationErrors { get; set; }
 
     /// <summary>
     /// Gets or sets metadata and telemetry for this validation.

@@ -15,6 +15,7 @@ using Microsoft.Sbom.Api.Entities.Output;
 using Microsoft.Sbom.Api.Output.Telemetry.Entities;
 using Microsoft.Sbom.Common;
 using Microsoft.Sbom.Common.Config;
+using Microsoft.Sbom.Contracts;
 using Microsoft.Sbom.Extensions.Entities;
 using PowerArgs;
 using Serilog;
@@ -35,7 +36,7 @@ public class TelemetryRecorder : IRecorder
     private readonly IList<Exception> exceptions = new List<Exception>();
     private readonly IList<Exception> apiExceptions = new List<Exception>();
     private readonly IList<Exception> metadataExceptions = new List<Exception>();
-    private IList<FileValidationResult> errors = new List<FileValidationResult>();
+    private IList<EntityError> errors = new List<EntityError>();
     private Result result = Result.Success;
 
     private int totalNumberOfPackages = 0;
@@ -117,7 +118,7 @@ public class TelemetryRecorder : IRecorder
         }
     }
 
-    public IList<FileValidationResult> Errors => errors;
+    public IList<EntityError> Errors => errors;
 
     /// <summary>
     /// Start recording the duration of exeuction of the given event.
@@ -141,7 +142,7 @@ public class TelemetryRecorder : IRecorder
     /// </summary>
     /// <param name="errors">A list of errors.</param>
     /// <exception cref="ArgumentNullException">If the errors object is null.</exception>
-    public void RecordTotalErrors(IList<FileValidationResult> errors)
+    public void RecordTotalErrors(IList<EntityError> errors)
     {
         this.errors = errors ?? throw new ArgumentNullException(nameof(errors));
     }
@@ -309,7 +310,7 @@ public class TelemetryRecorder : IRecorder
             var telemetry = new SBOMTelemetry
             {
                 Result = this.result,
-                Errors = new ErrorContainer<FileValidationResult>
+                Errors = new ErrorContainer<EntityError>
                 {
                     Errors = this.errors,
                     Count = this.errors.Count

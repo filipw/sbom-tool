@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Sbom.Api.Entities;
+using Microsoft.Sbom.Contracts;
 using Microsoft.Sbom.Extensions.Entities;
 
 namespace Microsoft.Sbom.Api.Output.Telemetry;
@@ -26,7 +27,7 @@ public interface IRecorder
     /// </summary>
     /// <param name="errors">A list of errors.</param>
     /// <exception cref="ArgumentNullException">If the errors object is null.</exception>
-    public void RecordTotalErrors(IList<FileValidationResult> errors);
+    public void RecordTotalErrors(IList<EntityError> errors);
 
     /// <summary>
     /// Record the total number of unique packages that were detected during the execution of the SBOM tool.
@@ -89,5 +90,5 @@ public interface IRecorder
     /// </summary>
     public Task FinalizeAndLogTelemetryAsync();
 
-    public IList<FileValidationResult> Errors { get; }
+    public IList<EntityError> Errors { get; }
 }

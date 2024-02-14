@@ -59,9 +59,9 @@ public class SBOMGeneratorTest
     [TestMethod]
     public async Task When_GenerateSbomAsync_WithRecordedErrors_Then_PopulateEntityErrors()
     {
-        var fileValidationResults = new List<FileValidationResult>
+        var fileValidationResults = new List<EntityError>
         {
-            new FileValidationResult() { Path = "random", ErrorType = ErrorType.Other }
+            new EntityError() { Entity = new FileEntity("some path"), ErrorType = EntityErrorType.Other }
         };
 
         mockRecorder.Setup(c => c.Errors).Returns(fileValidationResults).Verifiable();
@@ -85,7 +85,7 @@ public class SBOMGeneratorTest
     [TestMethod]
     public async Task When_GenerateSbomAsync_WithNoRecordedErrors_Then_EmptyEntityErrors()
     {
-        mockRecorder.Setup(c => c.Errors).Returns(new List<FileValidationResult>()).Verifiable();
+        mockRecorder.Setup(c => c.Errors).Returns(new List<EntityError>()).Verifiable();
         mockWorkflow.Setup(c => c.RunAsync()).Returns(Task.FromResult(true)).Verifiable();
 
         var metadata = new SBOMMetadata()

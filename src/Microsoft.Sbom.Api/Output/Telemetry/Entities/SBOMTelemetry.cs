@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.Sbom.Api.Entities;
 using Microsoft.Sbom.Api.Entities.Output;
 using Microsoft.Sbom.Common.Config;
+using Microsoft.Sbom.Contracts;
 
 namespace Microsoft.Sbom.Api.Output.Telemetry.Entities;
 
@@ -23,7 +24,7 @@ public class SBOMTelemetry
     /// <summary>
     /// Gets or sets a list of <see cref="FileValidationResult"/>s that was encountered during the execution.
     /// </summary>
-    public ErrorContainer<FileValidationResult> Errors { get; set; }
+    public ErrorContainer<EntityError> Errors { get; set; }
 
     /// <summary>
     /// Gets or sets a list of <see cref="ConfigurationSetting{T}"/> representing each input parameter used

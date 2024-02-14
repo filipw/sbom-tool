@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Sbom.Api.Utils;
 using Microsoft.Sbom.Common.Config;
+using Microsoft.Sbom.Contracts;
+using PowerArgs;
 
 namespace Microsoft.Sbom.Api.Entities.Output;
 
@@ -19,6 +21,7 @@ public class ValidationResultGenerator
     private int totalPackages;
     private TimeSpan duration;
     private readonly IConfiguration configuration;
+    private IList<EntityError> additionalErrors;
 
     public IList<FileValidationResult> NodeValidationResults { get; set; }
 
@@ -63,6 +66,12 @@ public class ValidationResultGenerator
         return this;
     }
 
+    public ValidationResultGenerator WithAdditionalErrors(IList<EntityError> errors)
+    {
+        this.additionalErrors = errors ?? new List<EntityError>();
+        return this;
+    }
+
     /// <summary>
     /// Finalizes the validation generation and returns a new <see cref="ValidationResult"/> object.
     /// </summary>
@@ -81,13 +90,16 @@ public class ValidationResultGenerator
             skippedErrors.AddRange(NodeValidationResults.Where(r => r.ErrorType == ErrorType.MissingFile));
         }
 
+        var allErrors = validationErrors.ConvertAll(fileValidationResult => fileValidationResult.ToEntityError());
+        allErrors.AddRange(this.additionalErrors);
+
         return new ValidationResult
         {
             Result = validationErrors.Count == 0 ? Result.Success : Result.Failure,
-            ValidationErrors = new ErrorContainer<FileValidationResult>
+            ValidationErrors = new ErrorContainer<EntityError>
             {
                 Count = validationErrors.Count,
-                Errors = validationErrors
+                Errors = allErrors,
             },
             Summary = new Summary
             {
